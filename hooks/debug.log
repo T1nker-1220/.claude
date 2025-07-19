@@ -1068,3 +1068,82 @@ Context:
 2025-07-20T00:34:55.281405 - SmartCheckpoint: All claude commands failed
 2025-07-20T00:34:55.281405 - SmartCheckpoint: Claude Task error: All claude command variations failed
 2025-07-20T00:34:55.282478 - SmartCheckpoint: AI commit generation failed: All claude command variations failed
+2025-07-20T00:34:55.370074 - SmartCheckpoint:  Smart commit created: chore: update debug.log +2 more
+{
+  "timestamp": "2025-07-20T00:35:14.805749",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "156a302f-9590-46e8-9e0f-1b3b6d31d18e",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\156a302f-9590-46e8-9e0f-1b3b6d31d18e.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+{
+  "timestamp": "2025-07-20T00:36:53.908315",
+  "event": "hook_triggered",
+  "payload": {
+    "session_id": "156a302f-9590-46e8-9e0f-1b3b6d31d18e",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\156a302f-9590-46e8-9e0f-1b3b6d31d18e.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Notification",
+    "message": "Claude needs your permission to use Update"
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Notification"
+  }
+}
+================================================================================
+2025-07-20T00:37:11.553935 - SmartCheckpoint: Tool context: Edit, success: True, response: {'filePath': 'C:\\Users\\NATH\\.claude\\hooks\\utils\\llms\\config.py', 'oldString': '    # Claude E...
+2025-07-20T00:37:11.553935 - SmartCheckpoint: Checkpoint decision: tool=Edit, success=True, should_checkpoint=True
+2025-07-20T00:37:11.563878 - SmartCheckpoint: Reading transcript with 336 lines...
+2025-07-20T00:37:11.563878 - SmartCheckpoint: No user messages found in transcript
+2025-07-20T00:37:11.570572 - SmartCheckpoint: Loaded tool history: 11 operations, 10 file ops
+2025-07-20T00:37:11.603858 - SmartCheckpoint: Generated prompt for LLM (first 300 chars): Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit
+- Session activity: editing files on production_client.py, config.py, smart_git_checkpoints.py
+- Change: Changed: '    # Claude Executable Setting...
+2025-07-20T00:37:11.625528 - SmartCheckpoint: Sending to LLM utility (first 200 chars): Generate git commit message from this context:
+
+Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edi...
+2025-07-20T00:37:11.626538 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-haiku-20241022 --output-format @prompt (406 chars)
+2025-07-20T00:37:11.626538 - LLMClient: Claude executable not found
+2025-07-20T00:37:11.626538 - LLMClient: ❌ LLM error: Claude executable not found
+2025-07-20T00:37:11.626538 - LLMClient: Trying fallback: claude-3-5-sonnet-20241022
+2025-07-20T00:37:11.627537 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-sonnet-20241022 --output-format @prompt (406 chars)
+2025-07-20T00:37:11.627537 - LLMClient: Claude executable not found
+2025-07-20T00:37:11.627537 - LLMClient: Fallback claude-3-5-sonnet-20241022 failed: Claude executable not found
+2025-07-20T00:37:11.628536 - LLMClient: All AI models failed, using manual fallback
+2025-07-20T00:37:11.628536 - SmartCheckpoint: ✅ LLM utility success: chore: update files
+2025-07-20T00:37:11.628536 - SmartCheckpoint: LLM returned hardcoded fallback, trying direct claude command
+2025-07-20T00:37:11.628536 - SmartCheckpoint: Trying claude command: claude
+2025-07-20T00:37:11.656345 - SmartCheckpoint: Claude command claude failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T00:37:11.656345 - SmartCheckpoint: Trying claude command: claude
+2025-07-20T00:37:11.680184 - SmartCheckpoint: Claude command claude failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T00:37:11.680184 - SmartCheckpoint: Trying claude command: claude.exe
+2025-07-20T00:37:11.709434 - SmartCheckpoint: Claude command claude.exe failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T00:37:11.714430 - SmartCheckpoint: Trying claude command: claude.cmd
+2025-07-20T00:37:11.729951 - SmartCheckpoint: Claude command claude.cmd failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T00:37:11.741857 - SmartCheckpoint: All claude commands failed
+2025-07-20T00:37:11.741857 - SmartCheckpoint: Claude Task error: All claude command variations failed
+2025-07-20T00:37:11.741857 - SmartCheckpoint: AI commit generation failed: All claude command variations failed

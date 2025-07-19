@@ -29,7 +29,7 @@ class LLMConfig:
     temperature: float = 0.1
     
     # Claude Executable Settings
-    claude_executable: str = "/c/Users/NATH/AppData/Local/pnpm/claude"  # Full path for reliability
+    claude_executable: str = "C:\\Users\\NATH\\AppData\\Local\\pnpm\\claude.CMD"  # Full path for reliability
     output_format: str = "text"
     print_mode: bool = True
     
