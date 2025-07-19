@@ -186,16 +186,16 @@ class LLMClient:
                 
                 self._log_debug(f"Executing: {cmd_args[0]} with {len(cmd_args)-1} args")
                 
-                # Force Windows CMD shell instead of bash
+                # Use cmd.exe explicitly to avoid bash issues
+                cmd_command = " ".join(f'"{arg}"' if " " in arg else arg for arg in cmd_args)
+                
                 result = subprocess.run(
-                    cmd_args,
+                    ["cmd.exe", "/c", cmd_command],
                     capture_output=True,
                     text=True,
                     timeout=self.config.default_timeout,
                     cwd=pathlib.Path.cwd(),
-                    shell=True,
-                    env=env,
-                    executable=None  # Let Windows choose the shell
+                    env=env
                 )
                 
                 if result.returncode == 0:
