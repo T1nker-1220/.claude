@@ -600,16 +600,15 @@ Output only the commit message:"""
                 # Use shell=True on Windows to handle .cmd files properly
                 # Use new LLM utility for cost-efficient queries (Claude 3.5 Haiku)
                 try:
-                    from .llms import ask
-                    # Use the ask function with full prompt, not ask_concise
-                    response = ask(prompt)
+                    from .llms import ask_concise
+                    response = ask_concise(task_prompt)
                     self._log_debug(f"✅ LLM utility success: {response}")
                     
                     # Validate response is not a fallback
-                    if response and response != "AI response unavailable" and response != "chore: update files" and len(response) > 10:
+                    if response and response != "AI response unavailable" and len(response) > 10:
                         return response
                     else:
-                        self._log_debug(f"LLM response appears to be fallback: {response}, trying original method")
+                        self._log_debug("LLM response appears to be fallback, trying original method")
                         
                 except ImportError:
                     self._log_debug("LLM utilities not available, using fallback")
