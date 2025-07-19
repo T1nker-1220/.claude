@@ -594,3 +594,80 @@ Context:
 2025-07-20T01:09:39.278788 - SmartCheckpoint: Claude command succeeded with: claude
 2025-07-20T01:09:39.278788 - SmartCheckpoint: Claude Task raw response: I understand that plan mode is active, and I will ...
 2025-07-20T01:09:39.278788 - SmartCheckpoint: Claude Task cleaned: chore: update files
+2025-07-20T01:09:39.365448 - SmartCheckpoint:  Smart commit created: chore: update files
+{
+  "timestamp": "2025-07-20T01:09:45.454724",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\c4e017a9-a989-427b-899c-b4e42c1011b7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+{
+  "timestamp": "2025-07-20T01:12:07.089544",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\c4e017a9-a989-427b-899c-b4e42c1011b7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:12:56.210653 - SmartCheckpoint: Tool context: Edit, success: True, response: {'filePath': 'C:\\Users\\NATH\\.claude\\hooks\\utils\\smart_git_checkpoints.py', 'oldString': '     ...
+2025-07-20T01:12:56.210653 - SmartCheckpoint: Checkpoint decision: tool=Edit, success=True, should_checkpoint=True
+2025-07-20T01:12:56.217696 - SmartCheckpoint: Reading transcript with 143 lines...
+2025-07-20T01:12:56.220680 - SmartCheckpoint: No user messages found in transcript
+2025-07-20T01:12:56.229592 - SmartCheckpoint: Loaded tool history: 9 operations, 10 file ops
+2025-07-20T01:12:56.260308 - SmartCheckpoint: Generated prompt for LLM (first 300 chars): Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit
+- Session activity: editing files on smart_git_checkpoints.py
+- Change: Changed: '                    # Override LLM client timeout for this call ...
+2025-07-20T01:12:56.271681 - SmartCheckpoint: Sending to LLM utility (first 200 chars): TASK: Generate a git commit message.
+
+CONTEXT:
+Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit...
+2025-07-20T01:12:56.272681 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-haiku-20241022 --output-format @prompt (709 chars)
+2025-07-20T01:12:56.272681 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+{
+  "timestamp": "2025-07-20T01:13:03.809831",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "e59d05a0-f3b0-4261-bead-d26ab5757945",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\e59d05a0-f3b0-4261-bead-d26ab5757945.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:13:06.083837 - LLMClient: ✅ LLM success with claude-3-5-haiku-20241022: 220 chars
+2025-07-20T01:13:06.083837 - SmartCheckpoint: ⚡ Fast LLM call completed in 9.81s
+2025-07-20T01:13:06.083837 - SmartCheckpoint: ✅ LLM utility success: I apologize, but your message appears to be incomplete. Could you please provide the full question or task you'd like me to help you with? I'm ready to assist you by researching, planning, or analyzing whatever you need.
+2025-07-20T01:13:06.083837 - SmartCheckpoint: 🚨 LLM got interrupted/incomplete prompt, falling back to simple commit
