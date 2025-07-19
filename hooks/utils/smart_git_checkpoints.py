@@ -498,20 +498,53 @@ class SmartGitCheckpoints:
             total_ops = session_context.get("total_operations", 0)
             file_count = session_context.get("file_count", 0)
             
-            # Create simple but effective prompt
-            session_prompt = f"""Generate a git commit message for this session.
+            # Extract more context about what actually happened
+            file_names = [op.get('file', 'unknown') for op in file_operations[:5]]
+            operation_types = [op.get('operation', 'edit') for op in file_operations[:5]]
+            
+            # Analyze the specific changes made
+            change_patterns = []
+            if any('hook' in name.lower() for name in file_names):
+                change_patterns.append("automation/hooks")
+            if any('util' in name.lower() for name in file_names):
+                change_patterns.append("utilities")
+            if any('config' in name.lower() or 'setting' in name.lower() for name in file_names):
+                change_patterns.append("configuration")
+            if any('test' in name.lower() for name in file_names):
+                change_patterns.append("testing")
+            
+            patterns_text = ', '.join(change_patterns) if change_patterns else 'code modules'
+            
+            # Build a much more detailed and context-rich prompt
+            session_prompt = f"""You are generating a git commit message that accurately reflects what the developer accomplished.
 
-SESSION SUMMARY:
-- Total operations: {total_ops}
-- Files changed: {file_count}
-- Activity: {tool_history.get('session_summary', 'code changes')}
+WHAT THE DEVELOPER DID:
+- Session Activity: {tool_history.get('session_summary', 'code changes')}
+- Changed {file_count} files with {total_ops} operations
+- Areas modified: {patterns_text}
 
-FILES CHANGED:
-{chr(10).join([f"- {op.get('file', 'unknown')}" for op in file_operations[:5]])}
+SPECIFIC FILES AND OPERATIONS:
+{chr(10).join([f"- {op.get('operation', 'edit').title()}: {op.get('file', 'unknown')}" for op in file_operations[:5]])}
 {'- ...' if len(file_operations) > 5 else ''}
 
-FORMAT: type(scope): description
-EXAMPLES: fix(auth): handle login errors, feat(ui): add search, refactor: improve code structure
+CONTEXT CLUES:
+- If hooks were modified: likely "feat(hooks)" or "refactor(hooks)"
+- If utilities enhanced: likely "refactor(utils)" or "feat(utils)" 
+- If configuration updated: likely "chore(config)" or "feat(config)"
+- If new features added: likely "feat:" 
+- If bugs fixed: likely "fix:"
+- If code improved/cleaned: likely "refactor:"
+
+YOUR TASK:
+Generate ONE conventional commit message that captures the main accomplishment.
+Format: type(scope): description
+Keep under 50 characters and use present tense.
+
+Examples of GOOD commit messages:
+- feat(hooks): add automated task chaining
+- refactor(utils): enhance voice notifications  
+- feat(voice): implement dynamic LLM responses
+- refactor(git): improve context-aware commits
 
 COMMIT MESSAGE:"""
 
@@ -542,57 +575,116 @@ COMMIT MESSAGE:"""
     def _generate_pattern_commit(self, session_context: Dict[str, Any], 
                                git_context: Dict[str, Any],
                                tool_history: Dict[str, Any]) -> str:
-        """Generate commit using simple pattern matching - instant and reliable."""
+        """Generate commit using intelligent pattern matching - analyze content and context."""
         file_operations = tool_history.get("file_operations", [])
         files_changed = git_context.get("files", [])
+        session_summary = tool_history.get("session_summary", "")
         
         if not file_operations:
-            return "chore: session updates"
+            return ""  # Let LLM handle this case
             
-        # Count operation types
-        edit_count = sum(1 for op in file_operations if op.get("operation", "").lower() == "edit")
+        # Analyze the session summary for clues about what was done
+        summary_lower = session_summary.lower()
         
-        # Analyze file types
-        py_files = [f for f in files_changed if f.get("file", "").endswith(".py")]
-        js_files = [f for f in files_changed if f.get("file", "").endswith((".js", ".ts", ".jsx", ".tsx"))]
-        config_files = [f for f in files_changed if "config" in f.get("file", "").lower()]
-        
-        # Smart pattern matching
-        if len(files_changed) == 1:
-            file_name = files_changed[0].get("file", "")
-            if "test" in file_name.lower():
-                return "test: update test files"
-            elif "config" in file_name.lower():
-                return "chore(config): update settings"
-            elif file_name.endswith(".py"):
-                return "refactor: update Python code"
-            elif file_name.endswith((".js", ".ts")):
-                return "refactor: update JavaScript code"
+        # Look for specific development patterns
+        if "creating files" in summary_lower or "write" in summary_lower:
+            if len(files_changed) == 1:
+                file_name = files_changed[0].get("file", "")
+                return f"feat: add {file_name.replace('.py', '').replace('.js', '').replace('.ts', '')}"
             else:
-                return f"chore: update {file_name}"
+                return f"feat: add {len(files_changed)} new files"
         
-        elif len(py_files) > 0 and len(js_files) == 0:
-            return f"refactor: update {len(py_files)} Python files"
-        elif len(js_files) > 0 and len(py_files) == 0:
-            return f"refactor: update {len(js_files)} JavaScript files"
-        elif len(config_files) > 0:
-            return "chore(config): update configuration"
-        else:
-            return f"chore: update {len(files_changed)} files"
+        elif "editing files" in summary_lower or "multi-file editing" in summary_lower:
+            # Try to infer the purpose from file names and operations
+            file_names = [f.get("file", "") for f in files_changed]
+            
+            # Check for specific patterns in file names
+            if any("hook" in name.lower() for name in file_names):
+                return "feat(hooks): enhance automation system"
+            elif any("test" in name.lower() for name in file_names):
+                return "test: update test suite"
+            elif any("util" in name.lower() for name in file_names):
+                return "refactor(utils): improve utilities"
+            elif any("config" in name.lower() or "setting" in name.lower() for name in file_names):
+                return "chore(config): update configuration"
+            elif any("api" in name.lower() for name in file_names):
+                return "feat(api): enhance API functionality"
+            elif any("ui" in name.lower() or "component" in name.lower() for name in file_names):
+                return "feat(ui): improve user interface"
+            
+            # Analyze by file extension and count
+            py_files = [f for f in files_changed if f.get("file", "").endswith(".py")]
+            js_files = [f for f in files_changed if f.get("file", "").endswith((".js", ".ts", ".jsx", ".tsx"))]
+            
+            if len(files_changed) == 1:
+                file_name = files_changed[0].get("file", "")
+                return f"refactor: enhance {file_name.replace('.py', '').replace('.js', '').replace('.ts', '')}"
+            elif len(py_files) > 0 and len(js_files) == 0:
+                return "refactor: enhance Python modules"
+            elif len(js_files) > 0 and len(py_files) == 0:
+                return "refactor: enhance JavaScript components"
+            else:
+                return f"refactor: enhance {len(files_changed)} modules"
+        
+        elif "executing commands" in summary_lower:
+            return "chore: run maintenance tasks"
+        
+        elif "reading/analyzing code" in summary_lower:
+            return ""  # Let LLM handle analysis sessions
+        
+        # If we can't determine intent from summary, return empty to use LLM
+        return ""
     
     def _create_session_fallback_commit(self, session_context: Dict[str, Any], 
                                       git_context: Dict[str, Any]) -> str:
-        """Create fallback commit for session-level processing."""
+        """Create intelligent fallback commit for session-level processing."""
         file_count = session_context.get("file_count", 0)
         total_ops = session_context.get("total_operations", 0)
+        files = git_context.get("files", [])
         
-        if file_count == 1:
-            files = git_context.get("files", [])
-            if files:
-                file_name = files[0].get("file", "file")
-                return f"chore: update {file_name}"
+        # Single file - be specific about what was changed
+        if file_count == 1 and files:
+            file_name = files[0].get("file", "file")
+            base_name = file_name.replace('.py', '').replace('.js', '').replace('.ts', '')
+            
+            # Infer purpose from filename
+            if "hook" in file_name.lower():
+                return f"feat(hooks): enhance {base_name}"
+            elif "util" in file_name.lower():
+                return f"refactor(utils): improve {base_name}"
+            elif "config" in file_name.lower() or "setting" in file_name.lower():
+                return f"chore(config): update {base_name}"
+            elif "test" in file_name.lower():
+                return f"test: update {base_name}"
+            else:
+                return f"refactor: enhance {base_name}"
         
-        return f"chore: session with {total_ops} operations on {file_count} files"
+        # Multiple files - analyze patterns
+        elif files:
+            file_names = [f.get("file", "") for f in files]
+            
+            if any("hook" in name.lower() for name in file_names):
+                return f"feat(hooks): enhance automation ({file_count} files)"
+            elif any("util" in name.lower() for name in file_names):
+                return f"refactor(utils): improve utilities ({file_count} files)"
+            elif any("config" in name.lower() or "setting" in name.lower() for name in file_names):
+                return f"chore(config): update configuration ({file_count} files)"
+            elif any("test" in name.lower() for name in file_names):
+                return f"test: update test suite ({file_count} files)"
+            else:
+                # Count by file type
+                py_count = sum(1 for name in file_names if name.endswith('.py'))
+                js_count = sum(1 for name in file_names if name.endswith(('.js', '.ts', '.jsx', '.tsx')))
+                
+                if py_count > 0 and js_count == 0:
+                    return f"refactor: enhance Python modules ({py_count} files)"
+                elif js_count > 0 and py_count == 0:
+                    return f"refactor: enhance JavaScript modules ({js_count} files)"
+                else:
+                    return f"refactor: enhance codebase ({file_count} files)"
+        
+        # Ultimate fallback
+        return f"chore: development session ({total_ops} operations)"
     
     def _build_ai_prompt(self, tool_context: Dict[str, Any], 
                         session_context: Dict[str, Any], 
