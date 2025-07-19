@@ -38,6 +38,30 @@ def main() -> None:
     # Process using utility functions
     process_stop_notification(payload)
 
+def process_session_git_checkpoint(payload) -> None:
+    """
+    Process smart git checkpoints for the entire session.
+    This runs after session ends, so no timing issues with LLM calls.
+    
+    Args:
+        payload: Stop hook payload containing session information
+    """
+    try:
+        session_id = payload.get("session_id")
+        if not session_id:
+            return
+            
+        # Create smart checkpoint processor
+        checkpoint = SmartGitCheckpoint()
+        
+        # Process the entire session at once
+        # This is much better than processing individual tools
+        checkpoint.process_session_checkpoint(session_id, payload)
+        
+    except Exception as e:
+        # Don't fail the hook if git processing fails
+        print(f"Git checkpoint error: {e}", file=sys.stderr)
+
 def log_to_logs_directory(payload) -> None:
     """
     Log Stop event to logs directory.
