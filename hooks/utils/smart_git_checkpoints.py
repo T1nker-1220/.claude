@@ -674,7 +674,7 @@ COMMIT MESSAGE:"""
                             ["cmd.exe", "/c", cmd_command],
                             capture_output=True, 
                             text=True, 
-                            timeout=10,  # Shorter timeout since this is fallback
+                            timeout=15,  # Give fallback commands reasonable time
                             cwd=pathlib.Path.cwd()
                         )
                         if result.returncode == 0:
