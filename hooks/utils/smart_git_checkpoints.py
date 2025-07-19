@@ -613,14 +613,33 @@ COMMIT MESSAGE:"""
                     
                     # Debug: Log what we're sending to LLM utility
                     self._log_debug(f"Sending to LLM utility (first 200 chars): {task_prompt[:200]}...")
-                    response = llm.ask(task_prompt, model="claude-3-5-haiku-20241022", max_tokens=30, system_prompt=commit_system_prompt)
+                    
+                    # Set very short timeout to avoid Stop hook interruption (5 seconds max)
+                    import time
+                    start_time = time.time()
+                    
+                    # Override LLM client timeout for this call
+                    original_timeout = llm.config.default_timeout
+                    llm.config.default_timeout = 5
+                    
+                    try:
+                        response = llm.ask(task_prompt, model="claude-3-5-haiku-20241022", max_tokens=30, system_prompt=commit_system_prompt)
+                        elapsed = time.time() - start_time
+                        self._log_debug(f"⚡ Fast LLM call completed in {elapsed:.2f}s")
+                    finally:
+                        # Restore original timeout
+                        llm.config.default_timeout = original_timeout
                     self._log_debug(f"✅ LLM utility success: {response}")
                     
-                    # Check if this is the hardcoded fallback
+                    # Check if this is the hardcoded fallback or conversational response
                     if response == "chore: update files":
                         self._log_debug("LLM returned hardcoded fallback, trying direct claude command")
-                    elif response and response != "AI response unavailable" and len(response) > 10:
-                        self._log_debug(f"LLM gave meaningful response: {response}")
+                    elif "apologize" in response.lower() or "incomplete" in response.lower() or "question" in response.lower():
+                        self._log_debug("🚨 LLM got interrupted/incomplete prompt, falling back to simple commit")
+                        # Use fallback immediately since the prompt was interrupted
+                        return self._create_fallback_commit(tool_context, git_context)
+                    elif response and response != "AI response unavailable" and len(response) > 10 and ":" in response:
+                        self._log_debug(f"✅ LLM gave meaningful commit message: {response}")
                         return response
                     else:
                         self._log_debug("LLM response appears to be fallback, trying original method")

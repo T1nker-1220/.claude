@@ -614,3 +614,148 @@ Context:
 2025-07-20T00:53:32.618543 - LLMClient: ✅ LLM success with claude-3-5-haiku-20241022: 261 chars
 2025-07-20T00:53:32.618543 - SmartCheckpoint: ✅ LLM utility success: I apologize, but your message seems to be incomplete. Could you please provide a complete question or request? I'm ready to help you with any software engineering task, whether it's analyzing code, implementing a feature, troubleshooting, or providing guidance.
 2025-07-20T00:53:32.618543 - SmartCheckpoint: LLM gave meaningful response: I apologize, but your message seems to be incomplete. Could you please provide a complete question or request? I'm ready to help you with any software engineering task, whether it's analyzing code, implementing a feature, troubleshooting, or providing guidance.
+2025-07-20T00:53:32.701104 - SmartCheckpoint:  Smart commit created: chore: edit operation
+{
+  "timestamp": "2025-07-20T00:56:14.861917",
+  "event": "hook_triggered",
+  "payload": {
+    "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\c4e017a9-a989-427b-899c-b4e42c1011b7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Notification",
+    "message": "Claude needs your permission to use Update"
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Notification"
+  }
+}
+================================================================================
+2025-07-20T00:56:16.984041 - SmartCheckpoint: Tool context: Edit, success: True, response: {'filePath': 'C:\\Users\\NATH\\.claude\\hooks\\utils\\smart_git_checkpoints.py', 'oldString': '     ...
+2025-07-20T00:56:16.984041 - SmartCheckpoint: Checkpoint decision: tool=Edit, success=True, should_checkpoint=True
+2025-07-20T00:56:16.993093 - SmartCheckpoint: Reading transcript with 72 lines...
+2025-07-20T00:56:16.993093 - SmartCheckpoint: No user messages found in transcript
+2025-07-20T00:56:17.002971 - SmartCheckpoint: Loaded tool history: 1 operations, 10 file ops
+2025-07-20T00:56:17.036066 - SmartCheckpoint: Generated prompt for LLM (first 300 chars): Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit
+- Session activity: mixed operations on smart_git_checkpoints.py
+- Change: Changed: '                    # Debug: Log what we're sending to LLM ut...
+2025-07-20T00:56:17.050765 - SmartCheckpoint: Sending to LLM utility (first 200 chars): TASK: Generate a git commit message.
+
+CONTEXT:
+Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit...
+2025-07-20T00:56:17.050765 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-haiku-20241022 --output-format @prompt (709 chars)
+2025-07-20T00:56:17.050765 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+{
+  "timestamp": "2025-07-20T00:56:23.726327",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "5c473ca9-1f2e-4a7b-9c84-e19d80fc397d",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\5c473ca9-1f2e-4a7b-9c84-e19d80fc397d.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T00:56:25.994386 - LLMClient: Claude timeout (5s)
+2025-07-20T00:56:25.994386 - LLMClient: ❌ LLM error: Claude timeout
+2025-07-20T00:56:25.994386 - LLMClient: Trying fallback: claude-3-5-sonnet-20241022
+2025-07-20T00:56:25.995387 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-sonnet-20241022 --output-format @prompt (709 chars)
+2025-07-20T00:56:25.995387 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+2025-07-20T00:57:31.398230 - SmartCheckpoint: Tool context: Edit, success: True, response: {'filePath': 'C:\\Users\\NATH\\.claude\\hooks\\utils\\smart_git_checkpoints.py', 'oldString': '     ...
+2025-07-20T00:57:31.398230 - SmartCheckpoint: Checkpoint decision: tool=Edit, success=True, should_checkpoint=True
+2025-07-20T00:57:31.403582 - SmartCheckpoint: Reading transcript with 77 lines...
+2025-07-20T00:57:31.408610 - SmartCheckpoint: No user messages found in transcript
+2025-07-20T00:57:31.417119 - SmartCheckpoint: Loaded tool history: 2 operations, 10 file ops
+2025-07-20T00:57:31.448429 - SmartCheckpoint: Generated prompt for LLM (first 300 chars): Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit
+- Session activity: editing files on smart_git_checkpoints.py
+- Change: Changed: '                    # Check if this is the hardcoded fallback
+  ...
+2025-07-20T00:57:31.462000 - SmartCheckpoint: Sending to LLM utility (first 200 chars): TASK: Generate a git commit message.
+
+CONTEXT:
+Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit...
+2025-07-20T00:57:31.462000 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-haiku-20241022 --output-format @prompt (709 chars)
+2025-07-20T00:57:31.463001 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+{
+  "timestamp": "2025-07-20T00:57:40.571584",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "b76fed5f-597c-4606-bf95-1ac6f4639d88",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\b76fed5f-597c-4606-bf95-1ac6f4639d88.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T00:57:42.834125 - LLMClient: Claude timeout (5s)
+2025-07-20T00:57:42.834125 - LLMClient: ❌ LLM error: Claude timeout
+2025-07-20T00:57:42.834125 - LLMClient: Trying fallback: claude-3-5-sonnet-20241022
+2025-07-20T00:57:42.834125 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-sonnet-20241022 --output-format @prompt (709 chars)
+2025-07-20T00:57:42.834125 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+{
+  "timestamp": "2025-07-20T00:57:47.427660",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "694e1ed8-8887-4766-af9e-a1001a5fda26",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\694e1ed8-8887-4766-af9e-a1001a5fda26.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T00:57:49.697068 - LLMClient: Claude timeout (5s)
+2025-07-20T00:57:49.698057 - LLMClient: Fallback claude-3-5-sonnet-20241022 failed: Claude timeout
+2025-07-20T00:57:49.698057 - LLMClient: All AI models failed, using manual fallback
+2025-07-20T00:57:49.698057 - SmartCheckpoint: ⚡ Fast LLM call completed in 18.24s
+2025-07-20T00:57:49.698057 - SmartCheckpoint: ✅ LLM utility success: chore: update files
+2025-07-20T00:57:49.698057 - SmartCheckpoint: LLM returned hardcoded fallback, trying direct claude command
+2025-07-20T00:57:49.698057 - SmartCheckpoint: Trying claude command: claude
+2025-07-20T00:57:49.725810 - SmartCheckpoint: Claude command claude failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T00:57:49.725810 - SmartCheckpoint: Trying claude command: claude
+2025-07-20T00:57:49.755582 - SmartCheckpoint: Claude command claude failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T00:57:49.755582 - SmartCheckpoint: Trying claude command: claude.exe
+2025-07-20T00:57:49.782891 - SmartCheckpoint: Claude command claude.exe failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T00:57:49.784395 - SmartCheckpoint: Trying claude command: claude.cmd
+2025-07-20T00:57:49.812156 - SmartCheckpoint: Claude command claude.cmd failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T00:57:49.812156 - SmartCheckpoint: All claude commands failed
+2025-07-20T00:57:49.813157 - SmartCheckpoint: Claude Task error: All claude command variations failed
+2025-07-20T00:57:49.813157 - SmartCheckpoint: AI commit generation failed: All claude command variations failed
