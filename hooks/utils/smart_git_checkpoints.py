@@ -425,7 +425,7 @@ class SmartGitCheckpoints:
         
         try:
             # Call Claude Code Task tool for intelligent commit generation
-            response = self._call_claude_task(prompt)
+            response = self._call_claude_task(prompt, tool_context, git_context)
             commit_message = response.strip()
             
             # Clean and validate AI response
@@ -637,7 +637,10 @@ COMMIT MESSAGE:"""
                     elif "apologize" in response.lower() or "incomplete" in response.lower() or "question" in response.lower():
                         self._log_debug("🚨 LLM got interrupted/incomplete prompt, falling back to simple commit")
                         # Use fallback immediately since the prompt was interrupted
-                        return self._create_fallback_commit(tool_context, git_context)
+                        if tool_context and git_context:
+                            return self._create_fallback_commit(tool_context, git_context)
+                        else:
+                            return "chore: interrupted LLM operation"
                     elif response and response != "AI response unavailable" and len(response) > 10 and ":" in response:
                         self._log_debug(f"✅ LLM gave meaningful commit message: {response}")
                         return response
