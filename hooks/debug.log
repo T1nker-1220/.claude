@@ -934,3 +934,32 @@ Context:
 2025-07-20T01:21:53.674866 - SmartCheckpoint: ⚡ Fast LLM call completed in 7.67s
 2025-07-20T01:21:53.674866 - SmartCheckpoint: ✅ LLM utility success: I apologize, but your message appears to be incomplete. Could you please rephrase or complete your question? I'm ready to help you with any task or query you might have.
 2025-07-20T01:21:53.675866 - SmartCheckpoint: 🚨 LLM got interrupted/incomplete prompt, falling back to simple commit
+2025-07-20T01:21:53.762404 - SmartCheckpoint:  Smart commit created: chore: update debug.log +3 more
+2025-07-20T01:22:33.753034 - SmartCheckpoint: Tool context: Edit, success: True, response: {'filePath': 'C:\\Users\\NATH\\.claude\\hooks\\utils\\smart_git_checkpoints.py', 'oldString': '     ...
+2025-07-20T01:22:33.753034 - SmartCheckpoint: Checkpoint decision: tool=Edit, success=True, should_checkpoint=True
+2025-07-20T01:22:33.761986 - SmartCheckpoint: Reading transcript with 208 lines...
+2025-07-20T01:22:33.762986 - SmartCheckpoint: No user messages found in transcript
+2025-07-20T01:22:33.772655 - SmartCheckpoint: Loaded tool history: 10 operations, 10 file ops
+2025-07-20T01:22:33.804010 - SmartCheckpoint: Generated prompt for LLM (first 300 chars): Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit
+- Session activity: editing files on stop.py, smart_git_checkpoints.py
+- Change: Changed: '        self.debug_log = pathlib.Path("C:/Users/NATH/.c...
+2025-07-20T01:22:33.816000 - SmartCheckpoint: Sending to LLM utility (first 200 chars): TASK: Generate a git commit message.
+
+CONTEXT:
+Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit...
+2025-07-20T01:22:33.817001 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-haiku-20241022 --output-format @prompt (709 chars)
+2025-07-20T01:22:33.817001 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+2025-07-20T01:22:40.915208 - LLMClient: ✅ LLM success with claude-3-5-haiku-20241022: 136 chars
+2025-07-20T01:22:40.915208 - SmartCheckpoint: ⚡ Fast LLM call completed in 7.10s
+2025-07-20T01:22:40.915208 - SmartCheckpoint: ✅ LLM utility success: I apologize, but your message seems to be incomplete. Could you please provide the full question or task you'd like me to help you with?
+2025-07-20T01:22:40.915208 - SmartCheckpoint: 🚨 LLM got interrupted/incomplete prompt, falling back to simple commit

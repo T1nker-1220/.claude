@@ -21,6 +21,52 @@ class SmartGitCheckpoints:
         self.debug_log = pathlib.Path("C:/Users/NATH/.claude/hooks/debug.log")
         self.logs_dir = pathlib.Path("C:/Users/NATH/.claude/logs")
     
+    def process_session_checkpoint(self, session_id: str, stop_payload: Dict[str, Any]) -> None:
+        """
+        Process git checkpoint for entire session - runs in Stop hook with no timing constraints.
+        
+        Args:
+            session_id: Session identifier
+            stop_payload: Stop hook payload with session information
+        """
+        try:
+            self._log_debug(f"🔄 Processing session checkpoint for {session_id}")
+            
+            # Load all tool usage from the entire session
+            tool_history = self._load_tool_usage_history(session_id)
+            
+            # Check if there were any meaningful file operations
+            file_operations = tool_history.get("file_operations", [])
+            if not file_operations:
+                self._log_debug("No file operations found, skipping checkpoint")
+                return
+                
+            # Analyze git repository state
+            git_context = self._analyze_git_changes()
+            if not git_context.get("files"):
+                self._log_debug("No git changes detected, skipping checkpoint")
+                return
+                
+            # Build session context
+            session_context = {
+                "session_id": session_id,
+                "total_operations": len(file_operations),
+                "file_count": len(git_context.get("files", [])),
+                "session_summary": tool_history.get("session_summary", "session activity")
+            }
+            
+            # Generate commit for entire session (with unlimited time!)
+            commit_message = self._generate_session_commit(session_context, git_context, tool_history)
+            
+            # Create the commit
+            if self._create_commit(commit_message):
+                self._log_debug(f"✅ Session commit created: {commit_message}")
+            else:
+                self._log_debug("❌ Failed to create session commit")
+                
+        except Exception as e:
+            self._log_debug(f"Session checkpoint error: {e}")
+    
     def process_checkpoint(self, payload: Dict[str, Any]) -> bool:
         """Main checkpoint processing function called by post_tool_use.py"""
         
