@@ -654,12 +654,13 @@ COMMIT MESSAGE:"""
                 
                 # Fallback to original claude command with Haiku for cost efficiency
                 
-                # Try different claude command variations for Windows
+                # Try different claude command variations for Windows (most reliable first)
                 claude_commands = [
-                    [self.claude_executable, "--print", "--model", "claude-3-5-haiku-20241022", "--output-format", "text", "--append-system-prompt", "Be extremely concise. Output only the requested git commit message with no explanations, analysis, or additional text.", f"@{temp_file_path}"],
-                    ["claude", "-p", "--model", "claude-3-5-haiku-20241022", f"@{temp_file_path}"],
-                    ["claude.exe", "-p", "--model", "claude-3-5-haiku-20241022", f"@{temp_file_path}"],
-                    ["claude.cmd", "-p", "--model", "claude-3-5-haiku-20241022", f"@{temp_file_path}"]
+                    # Use the exact path that worked before
+                    ["C:\\Users\\NATH\\AppData\\Local\\pnpm\\claude.CMD", "--model", "claude-3-5-haiku-20241022", "--output-format", "text", "--append-system-prompt", "Generate ONLY a conventional commit message. Format: type(scope): description. No explanations.", f"@{temp_file_path}"],
+                    # Fallback to generic commands
+                    ["claude.cmd", "--model", "claude-3-5-haiku-20241022", "--output-format", "text", f"@{temp_file_path}"],
+                    ["claude", "--model", "claude-3-5-haiku-20241022", f"@{temp_file_path}"]
                 ]
                 
                 result = None
