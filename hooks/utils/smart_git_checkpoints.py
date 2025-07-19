@@ -485,6 +485,115 @@ class SmartGitCheckpoints:
             self._log_debug(f"AI commit generation failed: {e}")
             return self._create_fallback_commit(tool_context, git_context)
     
+    def _generate_session_commit(self, session_context: Dict[str, Any], 
+                               git_context: Dict[str, Any],
+                               tool_history: Dict[str, Any]) -> str:
+        """
+        Generate commit message for entire session - much simpler and more reliable.
+        Since this runs in Stop hook, we have unlimited time for LLM calls.
+        """
+        try:
+            # Build session-level prompt
+            file_operations = tool_history.get("file_operations", [])
+            total_ops = session_context.get("total_operations", 0)
+            file_count = session_context.get("file_count", 0)
+            
+            # Create simple but effective prompt
+            session_prompt = f"""Generate a git commit message for this session.
+
+SESSION SUMMARY:
+- Total operations: {total_ops}
+- Files changed: {file_count}
+- Activity: {tool_history.get('session_summary', 'code changes')}
+
+FILES CHANGED:
+{chr(10).join([f"- {op.get('file', 'unknown')}" for op in file_operations[:5]])}
+{'- ...' if len(file_operations) > 5 else ''}
+
+FORMAT: type(scope): description
+EXAMPLES: fix(auth): handle login errors, feat(ui): add search, refactor: improve code structure
+
+COMMIT MESSAGE:"""
+
+            # Since we're in Stop hook, we can take time for LLM
+            self._log_debug("🚀 Session commit generation (unlimited time)")
+            
+            # Try simple pattern matching first (instant)
+            pattern_commit = self._generate_pattern_commit(session_context, git_context, tool_history)
+            if pattern_commit and pattern_commit != "chore: update files":
+                self._log_debug(f"✅ Using pattern-based commit: {pattern_commit}")
+                return pattern_commit
+            
+            # If pattern matching fails, use LLM (with time to complete)
+            self._log_debug("📝 Trying LLM generation for session commit")
+            llm_commit = self._call_claude_task(session_prompt)
+            if llm_commit and ":" in llm_commit and len(llm_commit) > 10:
+                cleaned = self._clean_commit_message(llm_commit)
+                self._log_debug(f"✅ LLM generated session commit: {cleaned}")
+                return cleaned
+            
+            # Final fallback
+            return self._create_session_fallback_commit(session_context, git_context)
+            
+        except Exception as e:
+            self._log_debug(f"Session commit generation error: {e}")
+            return self._create_session_fallback_commit(session_context, git_context)
+    
+    def _generate_pattern_commit(self, session_context: Dict[str, Any], 
+                               git_context: Dict[str, Any],
+                               tool_history: Dict[str, Any]) -> str:
+        """Generate commit using simple pattern matching - instant and reliable."""
+        file_operations = tool_history.get("file_operations", [])
+        files_changed = git_context.get("files", [])
+        
+        if not file_operations:
+            return "chore: session updates"
+            
+        # Count operation types
+        edit_count = sum(1 for op in file_operations if op.get("operation", "").lower() == "edit")
+        
+        # Analyze file types
+        py_files = [f for f in files_changed if f.get("file", "").endswith(".py")]
+        js_files = [f for f in files_changed if f.get("file", "").endswith((".js", ".ts", ".jsx", ".tsx"))]
+        config_files = [f for f in files_changed if "config" in f.get("file", "").lower()]
+        
+        # Smart pattern matching
+        if len(files_changed) == 1:
+            file_name = files_changed[0].get("file", "")
+            if "test" in file_name.lower():
+                return "test: update test files"
+            elif "config" in file_name.lower():
+                return "chore(config): update settings"
+            elif file_name.endswith(".py"):
+                return "refactor: update Python code"
+            elif file_name.endswith((".js", ".ts")):
+                return "refactor: update JavaScript code"
+            else:
+                return f"chore: update {file_name}"
+        
+        elif len(py_files) > 0 and len(js_files) == 0:
+            return f"refactor: update {len(py_files)} Python files"
+        elif len(js_files) > 0 and len(py_files) == 0:
+            return f"refactor: update {len(js_files)} JavaScript files"
+        elif len(config_files) > 0:
+            return "chore(config): update configuration"
+        else:
+            return f"chore: update {len(files_changed)} files"
+    
+    def _create_session_fallback_commit(self, session_context: Dict[str, Any], 
+                                      git_context: Dict[str, Any]) -> str:
+        """Create fallback commit for session-level processing."""
+        file_count = session_context.get("file_count", 0)
+        total_ops = session_context.get("total_operations", 0)
+        
+        if file_count == 1:
+            files = git_context.get("files", [])
+            if files:
+                file_name = files[0].get("file", "file")
+                return f"chore: update {file_name}"
+        
+        return f"chore: session with {total_ops} operations on {file_count} files"
+    
     def _build_ai_prompt(self, tool_context: Dict[str, Any], 
                         session_context: Dict[str, Any], 
                         git_context: Dict[str, Any],
