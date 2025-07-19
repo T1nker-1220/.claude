@@ -938,3 +938,62 @@ Context:
 2025-07-20T00:59:53.019700 - SmartCheckpoint: All claude commands failed
 2025-07-20T00:59:53.019700 - SmartCheckpoint: Claude Task error: All claude command variations failed
 2025-07-20T00:59:53.019700 - SmartCheckpoint: AI commit generation failed: All claude command variations failed
+2025-07-20T00:59:53.102441 - SmartCheckpoint:  Smart commit created: chore: update debug.log +3 more
+{
+  "timestamp": "2025-07-20T01:00:00.969008",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "a1c6bf03-bbb1-4617-a145-206168459f7c",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\a1c6bf03-bbb1-4617-a145-206168459f7c.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:00:03.242546 - LLMClient: Claude timeout (6s)
+2025-07-20T01:00:03.242546 - LLMClient: ❌ LLM error: Claude timeout
+2025-07-20T01:00:03.242546 - LLMClient: Trying fallback: claude-3-5-sonnet-20241022
+2025-07-20T01:00:03.243595 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-sonnet-20241022 --output-format @prompt (709 chars)
+2025-07-20T01:00:03.243918 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+{
+  "timestamp": "2025-07-20T01:00:21.857024",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "9a4316e1-6443-48b2-b15a-ce7a98b7cc24",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\9a4316e1-6443-48b2-b15a-ce7a98b7cc24.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:00:24.139467 - LLMClient: Claude timeout (6s)
+2025-07-20T01:00:24.140972 - LLMClient: Fallback claude-3-5-sonnet-20241022 failed: Claude timeout
+2025-07-20T01:00:24.140972 - LLMClient: All AI models failed, using manual fallback
+2025-07-20T01:00:24.140972 - SmartCheckpoint: ⚡ Fast LLM call completed in 31.24s
+2025-07-20T01:00:24.140972 - SmartCheckpoint: ✅ LLM utility success: chore: update files
+2025-07-20T01:00:24.140972 - SmartCheckpoint: LLM returned hardcoded fallback, trying direct claude command
+2025-07-20T01:00:24.141976 - SmartCheckpoint: Trying claude command: claude
+2025-07-20T01:00:24.167876 - SmartCheckpoint: Claude command claude failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T01:00:24.167876 - SmartCheckpoint: Trying claude command: claude
+2025-07-20T01:00:24.191164 - SmartCheckpoint: Claude command claude failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T01:00:24.191164 - SmartCheckpoint: Trying claude command: claude.exe
+2025-07-20T01:00:24.225175 - SmartCheckpoint: Claude command claude.exe failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T01:00:24.225175 - SmartCheckpoint: Trying claude command: claude.cmd
+2025-07-20T01:00:24.251128 - SmartCheckpoint: Claude command claude.cmd failed with code 127: /usr/bin/bash: Files\Git\bin\bash.exe: No such file or directory
+
+2025-07-20T01:00:24.251128 - SmartCheckpoint: All claude commands failed
+2025-07-20T01:00:24.251128 - SmartCheckpoint: Claude Task error: All claude command variations failed
+2025-07-20T01:00:24.251128 - SmartCheckpoint: AI commit generation failed: All claude command variations failed
