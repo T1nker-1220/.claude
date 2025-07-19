@@ -572,17 +572,25 @@ Generate ONLY the commit message:"""
             with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as temp_file:
                 # Ultra-compact prompt for minimal token usage
                 # Extract key info from the original detailed prompt
-                task_prompt = f"""Generate git commit message from this context:
+                task_prompt = f"""TASK: Generate a git commit message.
 
-{prompt[:200]}
+CONTEXT:
+{prompt[:300]}
 
-Format: type(scope): description
-Max 50 chars. Examples:
-feat(auth): add login
-fix(api): handle errors
-chore: update config
+REQUIREMENTS:
+- Use conventional commit format: type(scope): description  
+- Maximum 50 characters
+- Use present tense verbs
+- Do NOT provide explanations or conversation
+- Output ONLY the commit message
 
-Output only the commit message:"""
+EXAMPLES:
+feat(auth): add login validation
+fix(parser): handle null values  
+refactor(ui): extract components
+chore(deps): update packages
+
+COMMIT MESSAGE:"""
                 
                 temp_file.write(task_prompt)
                 temp_file_path = temp_file.name
