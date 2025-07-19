@@ -374,7 +374,7 @@ class SmartGitCheckpoints:
         return {"filename": "unknown", "directory": "", "extension": ""}
     
     def _analyze_git_changes(self) -> Dict[str, Any]:
-        """Analyze current git repository changes."""
+        """Analyze current git repository changes with detailed diff analysis."""
         try:
             # Try to find git repository from working directory
             working_dir = pathlib.Path.cwd()
@@ -414,7 +414,7 @@ class SmartGitCheckpoints:
             # Get git status
             status_result = subprocess.run(
                 ["git", "status", "--porcelain"], 
-                capture_output=True, text=True, timeout=10
+                capture_output=True, text=True, timeout=10, cwd=working_dir
             )
             
             if status_result.returncode != 0:
@@ -433,17 +433,277 @@ class SmartGitCheckpoints:
                         "extension": pathlib.Path(filename).suffix
                     })
             
+            # Get detailed diff information for better context
+            diff_analysis = self._analyze_git_diff(working_dir, changed_files)
+            
             return {
                 "status": "changes_detected" if changed_files else "no_changes",
                 "files": changed_files,
                 "file_count": len(changed_files),
-                "primary_file": changed_files[0] if changed_files else None
+                "primary_file": changed_files[0] if changed_files else None,
+                "diff_analysis": diff_analysis,
+                "working_dir": str(working_dir)
             }
             
         except Exception as e:
             self._log_debug(f"Git analysis error: {e}")
             return {"status": f"error: {e}", "files": []}
     
+    def _analyze_git_diff(self, working_dir: pathlib.Path, changed_files: list) -> Dict[str, Any]:
+        """Analyze git diff to understand what actually changed in the code."""
+        try:
+            diff_analysis = {
+                "summary": "no changes detected",
+                "function_changes": [],
+                "import_changes": [],
+                "config_changes": [],
+                "major_additions": [],
+                "deletions": [],
+                "change_context": []
+            }
+            
+            # Get diff for both staged and unstaged changes
+            diff_commands = [
+                ["git", "diff", "--cached"],  # Staged changes
+                ["git", "diff"]               # Unstaged changes
+            ]
+            
+            all_diff_output = ""
+            for cmd in diff_commands:
+                try:
+                    diff_result = subprocess.run(
+                        cmd, 
+                        capture_output=True, text=True, timeout=15, cwd=working_dir
+                    )
+                    if diff_result.returncode == 0 and diff_result.stdout.strip():
+                        all_diff_output += diff_result.stdout + "\n"
+                except subprocess.TimeoutExpired:
+                    self._log_debug("Git diff command timed out")
+                    continue
+            
+            if not all_diff_output.strip():
+                return diff_analysis
+            
+            # Analyze the diff content
+            diff_lines = all_diff_output.split('\n')
+            current_file = ""
+            added_lines = []
+            removed_lines = []
+            
+            for line in diff_lines:
+                # Track which file we're looking at
+                if line.startswith('diff --git'):
+                    current_file = line.split(' ')[-1] if ' ' in line else ""
+                elif line.startswith('+++'):
+                    current_file = line[4:].strip() if len(line) > 4 else current_file
+                
+                # Analyze added lines (what was added)
+                elif line.startswith('+') and not line.startswith('+++'):
+                    clean_line = line[1:].strip()
+                    if clean_line:  # Skip empty lines
+                        added_lines.append({
+                            "content": clean_line,
+                            "file": current_file
+                        })
+                
+                # Analyze removed lines (what was deleted)
+                elif line.startswith('-') and not line.startswith('---'):
+                    clean_line = line[1:].strip()
+                    if clean_line:  # Skip empty lines
+                        removed_lines.append({
+                            "content": clean_line,
+                            "file": current_file
+                        })
+            
+            # Analyze what types of changes were made
+            self._analyze_code_changes(added_lines, removed_lines, diff_analysis)
+            
+            # Generate human-readable summary
+            diff_analysis["summary"] = self._generate_diff_summary(diff_analysis)
+            
+            self._log_debug(f"Diff analysis complete: {diff_analysis['summary']}")
+            return diff_analysis
+            
+        except Exception as e:
+            self._log_debug(f"Diff analysis error: {e}")
+            return {
+                "summary": f"diff analysis failed: {e}",
+                "function_changes": [],
+                "import_changes": [],
+                "config_changes": [],
+                "major_additions": [],
+                "deletions": [],
+                "change_context": []
+            }
+    
+    def _analyze_code_changes(self, added_lines: list, removed_lines: list, diff_analysis: Dict[str, Any]) -> None:
+        """Analyze the specific code changes to understand what was modified."""
+        
+        # Analyze added content
+        for addition in added_lines:
+            content = addition["content"]
+            file_name = addition["file"]
+            
+            # Function/method definitions
+            if any(pattern in content for pattern in ["def ", "function ", "class ", "const ", "let ", "var "]):
+                if "def " in content or "function " in content:
+                    func_name = self._extract_function_name(content)
+                    if func_name:
+                        diff_analysis["function_changes"].append({
+                            "type": "added",
+                            "name": func_name,
+                            "file": file_name
+                        })
+                
+                elif "class " in content:
+                    class_name = self._extract_class_name(content)
+                    if class_name:
+                        diff_analysis["function_changes"].append({
+                            "type": "added",
+                            "name": f"class {class_name}",
+                            "file": file_name
+                        })
+            
+            # Import statements
+            elif any(pattern in content for pattern in ["import ", "from ", "require(", "#include"]):
+                diff_analysis["import_changes"].append({
+                    "type": "added",
+                    "content": content[:80],  # First 80 chars
+                    "file": file_name
+                })
+            
+            # Configuration changes
+            elif any(pattern in content.lower() for pattern in ["config", "setting", "option", "param"]):
+                diff_analysis["config_changes"].append({
+                    "type": "added", 
+                    "content": content[:80],
+                    "file": file_name
+                })
+            
+            # Major additions (long lines that look like significant code)
+            elif len(content) > 50 and any(pattern in content for pattern in ["=", "{", ":", "("]):
+                diff_analysis["major_additions"].append({
+                    "content": content[:100],
+                    "file": file_name
+                })
+        
+        # Analyze removed content
+        for removal in removed_lines:
+            content = removal["content"]
+            file_name = removal["file"]
+            
+            # Function/method deletions
+            if any(pattern in content for pattern in ["def ", "function ", "class "]):
+                if "def " in content or "function " in content:
+                    func_name = self._extract_function_name(content)
+                    if func_name:
+                        diff_analysis["function_changes"].append({
+                            "type": "removed",
+                            "name": func_name,
+                            "file": file_name
+                        })
+            
+            # Major deletions
+            elif len(content) > 30:
+                diff_analysis["deletions"].append({
+                    "content": content[:80],
+                    "file": file_name
+                })
+    
+    def _extract_function_name(self, line: str) -> str:
+        """Extract function name from a function definition line."""
+        try:
+            # Python: def function_name(
+            if "def " in line:
+                start = line.find("def ") + 4
+                end = line.find("(", start)
+                if end > start:
+                    return line[start:end].strip()
+            
+            # JavaScript: function functionName( or const functionName =
+            elif "function " in line:
+                start = line.find("function ") + 9
+                end = line.find("(", start)
+                if end > start:
+                    return line[start:end].strip()
+            
+            elif any(pattern in line for pattern in ["const ", "let ", "var "]) and "=" in line:
+                # const/let/var functionName = 
+                for pattern in ["const ", "let ", "var "]:
+                    if pattern in line:
+                        start = line.find(pattern) + len(pattern)
+                        end = line.find("=", start)
+                        if end > start:
+                            return line[start:end].strip()
+            
+            return ""
+        except:
+            return ""
+    
+    def _extract_class_name(self, line: str) -> str:
+        """Extract class name from a class definition line."""
+        try:
+            if "class " in line:
+                start = line.find("class ") + 6
+                # Find end - could be ( for inheritance or : for Python
+                end_chars = ["(", ":", "{", " "]
+                end = len(line)
+                for char in end_chars:
+                    pos = line.find(char, start)
+                    if pos > start:
+                        end = min(end, pos)
+                return line[start:end].strip()
+            return ""
+        except:
+            return ""
+    
+    def _generate_diff_summary(self, diff_analysis: Dict[str, Any]) -> str:
+        """Generate a human-readable summary of the changes."""
+        parts = []
+        
+        # Function changes
+        func_changes = diff_analysis["function_changes"]
+        if func_changes:
+            added_funcs = [f for f in func_changes if f["type"] == "added"]
+            removed_funcs = [f for f in func_changes if f["type"] == "removed"]
+            
+            if added_funcs:
+                if len(added_funcs) == 1:
+                    parts.append(f"added {added_funcs[0]['name']}")
+                else:
+                    parts.append(f"added {len(added_funcs)} functions/classes")
+            
+            if removed_funcs:
+                if len(removed_funcs) == 1:
+                    parts.append(f"removed {removed_funcs[0]['name']}")
+                else:
+                    parts.append(f"removed {len(removed_funcs)} functions/classes")
+        
+        # Import changes
+        import_changes = diff_analysis["import_changes"]
+        if import_changes:
+            parts.append(f"updated imports")
+        
+        # Config changes
+        config_changes = diff_analysis["config_changes"]
+        if config_changes:
+            parts.append("modified configuration")
+        
+        # Major additions
+        major_additions = diff_analysis["major_additions"]
+        if major_additions and not func_changes:  # Only mention if no function changes
+            parts.append(f"added {len(major_additions)} code blocks")
+        
+        # Deletions
+        deletions = diff_analysis["deletions"]
+        if deletions and not func_changes:  # Only mention if no function changes
+            parts.append(f"removed {len(deletions)} code blocks")
+        
+        if parts:
+            return ", ".join(parts)
+        else:
+            return "modified code structure"
+
     def _interpret_git_status(self, status_code: str) -> str:
         """Convert git status codes to readable actions."""
         status_map = {
@@ -515,6 +775,24 @@ class SmartGitCheckpoints:
             
             patterns_text = ', '.join(change_patterns) if change_patterns else 'code modules'
             
+            # Get detailed diff analysis for richer context
+            diff_analysis = git_context.get('diff_analysis', {})
+            diff_summary = diff_analysis.get('summary', 'code changes')
+            function_changes = diff_analysis.get('function_changes', [])
+            
+            # Build function change summary
+            func_summary = ""
+            if function_changes:
+                added_funcs = [f for f in function_changes if f.get('type') == 'added']
+                if added_funcs:
+                    func_names = [f.get('name', 'function') for f in added_funcs[:3]]
+                    if len(func_names) == 1:
+                        func_summary = f"Added function: {func_names[0]}"
+                    else:
+                        func_summary = f"Added functions: {', '.join(func_names[:2])}"
+                        if len(added_funcs) > 2:
+                            func_summary += f" (+{len(added_funcs)-2} more)"
+            
             # Build a much more detailed and context-rich prompt
             session_prompt = f"""You are generating a git commit message that accurately reflects what the developer accomplished.
 
@@ -523,28 +801,36 @@ WHAT THE DEVELOPER DID:
 - Changed {file_count} files with {total_ops} operations
 - Areas modified: {patterns_text}
 
+ACTUAL CODE CHANGES (from git diff):
+- Summary: {diff_summary}
+{f"- {func_summary}" if func_summary else ""}
+
 SPECIFIC FILES AND OPERATIONS:
 {chr(10).join([f"- {op.get('operation', 'edit').title()}: {op.get('file', 'unknown')}" for op in file_operations[:5]])}
 {'- ...' if len(file_operations) > 5 else ''}
 
-CONTEXT CLUES:
+CONTEXT CLUES FOR BETTER COMMIT MESSAGES:
 - If hooks were modified: likely "feat(hooks)" or "refactor(hooks)"
 - If utilities enhanced: likely "refactor(utils)" or "feat(utils)" 
 - If configuration updated: likely "chore(config)" or "feat(config)"
 - If new features added: likely "feat:" 
 - If bugs fixed: likely "fix:"
 - If code improved/cleaned: likely "refactor:"
+- If functions added: likely "feat:" with function name
+- If imports added: likely "feat:" or "refactor:"
 
 YOUR TASK:
 Generate ONE conventional commit message that captures the main accomplishment.
-Format: type(scope): description
-Keep under 50 characters and use present tense.
+Use the actual code changes to be specific about what was done.
+Format: type(scope): description  
+Keep under 72 characters (longer than before for more detail).
+Use present tense and be specific.
 
 Examples of GOOD commit messages:
-- feat(hooks): add automated task chaining
-- refactor(utils): enhance voice notifications  
-- feat(voice): implement dynamic LLM responses
-- refactor(git): improve context-aware commits
+- feat(hooks): add get_dynamic_notification function for LLM voice alerts
+- refactor(git): enhance _analyze_git_diff with function detection  
+- feat(voice): implement dynamic LLM-generated notifications
+- refactor(utils): add git diff analysis for better commit context
 
 COMMIT MESSAGE:"""
 
@@ -693,7 +979,7 @@ COMMIT MESSAGE:"""
         """Build AI prompt for intelligent commit message generation."""
         
         # Extract detailed context
-        user_intent = " | ".join(session_context.get("user_intent", ["unknown"]))[:250] # Increased length slightly
+        user_intent = " | ".join(session_context.get("user_intent", ["unknown"]))[:250]
         tool_name = tool_context.get("tool_name", "unknown")
         files_changed = [f["file"] for f in git_context.get("files", [])]
         primary_file = git_context.get("primary_file", {})
@@ -701,30 +987,52 @@ COMMIT MESSAGE:"""
         # Get file content context from tool_input
         tool_input = tool_context.get("tool_input", {})
         change_description = self._classify_file_operation(tool_input)
-            
+        
         # Extract tool history context
         session_activity = tool_history.get("session_summary", "unknown activity")
         
-        # Build a more robust prompt that emphasizes user intent
+        # Get detailed diff analysis for richer context
+        diff_analysis = git_context.get('diff_analysis', {})
+        diff_summary = diff_analysis.get('summary', 'code changes')
+        function_changes = diff_analysis.get('function_changes', [])
+        
+        # Build function change summary
+        func_details = ""
+        if function_changes:
+            added_funcs = [f for f in function_changes if f.get('type') == 'added']
+            if added_funcs:
+                func_names = [f.get('name', 'function') for f in added_funcs[:2]]
+                func_details = f"Added: {', '.join(func_names)}"
+        
+        # Build a more robust prompt that emphasizes user intent and actual changes
         prompt = f"""Generate a git commit message in the conventional commit format.
-Your primary goal is to reflect the user's original request.
+Your primary goal is to reflect what the developer actually accomplished.
 
-**User's Goal:**
+**User's Original Request:**
 {user_intent}
 
+**What Actually Changed (git diff analysis):**
+- Summary: {diff_summary}
+{f"- Functions: {func_details}" if func_details else ""}
+- Operation: {change_description} on {primary_file.get('file', 'unknown')}
+
 **Session Context:**
-- **File(s) Changed:** {', '.join(files_changed)}
-- **Primary Change Type:** {change_description} on {primary_file.get('file', 'unknown')}
-- **Recent Activity:** {session_activity}
+- File(s) Changed: {', '.join(files_changed)}
+- Recent Activity: {session_activity}
 
 **Instructions:**
-1.  **Prioritize the User's Goal.** The commit message must align with their request.
+1.  **Be Specific:** Use the actual code changes to describe what was done
 2.  **Format:** `type(scope): description`
-3.  **Be Concise:** Under 50 characters.
+3.  **Length:** Up to 72 characters for more detail
 4.  **Use Present Tense.**
-5.  **Types:** feat, fix, refactor, docs, style, test, chore.
+5.  **Types:** feat, fix, refactor, docs, style, test, chore
 
-Based on the user's goal, generate ONLY the single-line commit message:"""
+**Examples of good commits:**
+- feat(hooks): add get_dynamic_notification for LLM voice alerts
+- refactor(git): enhance diff analysis with function detection
+- feat(voice): implement dynamic LLM-generated notifications
+
+Based on the actual changes made, generate the commit message:"""
         
         return prompt
     
