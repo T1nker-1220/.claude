@@ -601,57 +601,38 @@ COMMIT MESSAGE:"""
         """Build AI prompt for intelligent commit message generation."""
         
         # Extract detailed context
-        user_intent = " | ".join(session_context.get("user_intent", ["unknown"]))[:200]
+        user_intent = " | ".join(session_context.get("user_intent", ["unknown"]))[:250] # Increased length slightly
         tool_name = tool_context.get("tool_name", "unknown")
         files_changed = [f["file"] for f in git_context.get("files", [])]
         primary_file = git_context.get("primary_file", {})
         
         # Get file content context from tool_input
         tool_input = tool_context.get("tool_input", {})
-        file_path = tool_input.get("file_path", "")
-        old_string = tool_input.get("old_string", "")[:100]
-        new_string = tool_input.get("new_string", "")[:100]
-        
-        # Extract specific changes
-        change_description = ""
-        if old_string and new_string:
-            change_description = f"Changed: '{old_string}' → '{new_string}'"
-        
+        change_description = self._classify_file_operation(tool_input)
+            
         # Extract tool history context
         session_activity = tool_history.get("session_summary", "unknown activity")
-        total_ops = tool_history.get("total_operations", 0)
-        file_ops = tool_history.get("file_operations", [])
         
-        # Build tool history summary
-        tool_context_summary = ""
-        if file_ops:
-            recent_file_ops = file_ops[-3:]  # Last 3 file operations
-            ops_summary = []
-            for op in recent_file_ops:
-                ops_summary.append(f"{op.get('operation', 'edit')} {op.get('file', 'file')}")
-            tool_context_summary = f"Recent: {', '.join(ops_summary)}"
-        
-        prompt = f"""Generate a git commit message using conventional commit format.
+        # Build a more robust prompt that emphasizes user intent
+        prompt = f"""Generate a git commit message in the conventional commit format.
+Your primary goal is to reflect the user's original request.
 
-Context:
-- User request: {user_intent}
-- File: {primary_file.get('file', 'unknown')}
-- Operation: {tool_name}
-- Session activity: {session_activity}
-- Change: {change_description}
+**User's Goal:**
+{user_intent}
 
-Rules:
-- Format: type(scope): description
-- Under 50 characters
-- Present tense
-- Types: feat, fix, refactor, docs, style, test, chore
+**Session Context:**
+- **File(s) Changed:** {', '.join(files_changed)}
+- **Primary Change Type:** {change_description} on {primary_file.get('file', 'unknown')}
+- **Recent Activity:** {session_activity}
 
-Examples:
-- feat(auth): add login validation
-- fix(parser): handle null values
-- refactor(ui): extract components
+**Instructions:**
+1.  **Prioritize the User's Goal.** The commit message must align with their request.
+2.  **Format:** `type(scope): description`
+3.  **Be Concise:** Under 50 characters.
+4.  **Use Present Tense.**
+5.  **Types:** feat, fix, refactor, docs, style, test, chore.
 
-Generate ONLY the commit message:"""
+Based on the user's goal, generate ONLY the single-line commit message:"""
         
         return prompt
     

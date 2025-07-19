@@ -8,6 +8,7 @@
 # ///
 
 import json, os, sys, pyttsx3, pathlib, itertools
+from utils.llms import ask_concise
 
 def speak(text: str, voice_index: int = None) -> None:
     eng = pyttsx3.init()        # Windows SAPI-5 voice
@@ -35,6 +36,35 @@ def speak(text: str, voice_index: int = None) -> None:
     eng.setProperty("rate", 185)
     eng.say(text)
     eng.runAndWait()
+
+def get_dynamic_notification(tool: str, summary: str) -> str:
+    """Generate a friendly, dynamic voice notification using an LLM."""
+    if not summary:
+        return "" # Can't generate a notification without a summary
+
+    try:
+        # We use a very specific prompt to get a short, conversational response.
+        prompt = (
+            f"You are a voice assistant for a programmer. Create a very short, friendly notification "
+            f"(under 12 words) for the following completed action. Be conversational. "
+            f"Do not say 'task completed'.\n\n"
+            f"Tool Used: '{tool}'\n"
+            f"Action Summary: '{summary}'\n\n"
+            f"Example: If the summary is 'Modified file: auth.py', a good response would be "
+            f"'Okay, I've just updated the auth file for you.'\n\n"
+            f"Your notification:"
+        )
+        
+        # Use the cost-efficient LLM utility
+        notification_text = ask_concise(prompt)
+        
+        if notification_text and "unavailable" not in notification_text:
+            return notification_text
+        return ""
+    except Exception:
+        # If the LLM call fails for any reason, return an empty string
+        # The system will then fall back to the simple notification
+        return ""
 
 def get_simple_notification(context: str, tool: str) -> str:
     """Generate simple, direct voice notifications for each tool."""
@@ -527,9 +557,10 @@ def process_notification(payload: dict) -> None:
         notification_message = payload.get("message", "")
         
         # Detect notification context
-        context, tool, result = detect_notification_context(payload, transcript_path)
+        context, tool, result_summary = detect_notification_context(payload, transcript_path)
         
-        if not tool and not result:
+        # If there's no specific tool context, use a simple ready message
+        if not tool and not result_summary:
             speak("Claude is ready.")
             return
     else:
@@ -537,11 +568,20 @@ def process_notification(payload: dict) -> None:
         speak("Claude notification received.")
         return
 
-    # Generate simple, direct notification
-    text = get_simple_notification(context, tool)
+    # --- NEW DYNAMIC LOGIC ---
+    final_text = ""
+    # 1. Try to generate a dynamic notification first
+    if context == "tool_completion":
+        dynamic_text = get_dynamic_notification(tool, result_summary)
+        if dynamic_text:
+            final_text = dynamic_text
+            
+    # 2. If dynamic generation failed or isn't applicable, use the simple one
+    if not final_text:
+        final_text = get_simple_notification(context, tool)
     
-    # Ensure we always have something to say
-    final_text = text or "Claude notification"
+    # 3. Final fallback to ensure we always say something
+    final_text = final_text or "Claude notification"
     speak(final_text)
 
 def detect_stop_context(payload: dict) -> tuple[str, str]:
