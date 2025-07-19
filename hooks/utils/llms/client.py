@@ -163,6 +163,17 @@ class LLMClient:
                 # Execute command - build command string for shell execution
                 command_str = " ".join(f'"{arg}"' if " " in arg else arg for arg in args)
                 
+                # Ensure proper environment with pnpm path
+                import os
+                env = os.environ.copy()
+                
+                # Add pnpm path if not already there
+                pnpm_path = r'C:\Users\NATH\AppData\Local\pnpm'
+                if 'PATH' in env and pnpm_path not in env['PATH']:
+                    env['PATH'] = pnpm_path + ';' + env['PATH']
+                elif 'PATH' not in env:
+                    env['PATH'] = pnpm_path
+                
                 result = subprocess.run(
                     command_str,
                     capture_output=True,
@@ -170,7 +181,7 @@ class LLMClient:
                     timeout=self.config.default_timeout,
                     cwd=pathlib.Path.cwd(),
                     shell=True,
-                    executable='/usr/bin/bash'  # Use the bash we know works
+                    env=env  # Use Windows shell, not bash
                 )
                 
                 if result.returncode == 0:
