@@ -614,19 +614,38 @@ Output only the commit message:"""
                 
                 # Fallback to original claude command with Haiku for cost efficiency
                 
-                result = subprocess.run([
-                    self.claude_executable, 
-                    "--print",  # Print response and exit (non-interactive)
-                    "--model", "claude-3-5-haiku-20241022",  # Use Haiku for cost efficiency
-                    "--output-format", "text",  # Plain text output only
-                    "--append-system-prompt", "Be extremely concise. Output only the requested git commit message with no explanations, analysis, or additional text.",
-                    f"@{temp_file_path}"  # Read prompt from file
-                ], 
-                capture_output=True, 
-                text=True, 
-                timeout=30,  # Reduced timeout for simple task
-                cwd=pathlib.Path.cwd(),
-                shell=True)  # Required for .cmd files on Windows
+                # Try different claude command variations for Windows
+                claude_commands = [
+                    [self.claude_executable, "--print", "--model", "claude-3-5-haiku-20241022", "--output-format", "text", "--append-system-prompt", "Be extremely concise. Output only the requested git commit message with no explanations, analysis, or additional text.", f"@{temp_file_path}"],
+                    ["claude", "-p", "--model", "claude-3-5-haiku-20241022", f"@{temp_file_path}"],
+                    ["claude.exe", "-p", "--model", "claude-3-5-haiku-20241022", f"@{temp_file_path}"],
+                    ["claude.cmd", "-p", "--model", "claude-3-5-haiku-20241022", f"@{temp_file_path}"]
+                ]
+                
+                result = None
+                for cmd in claude_commands:
+                    try:
+                        self._log_debug(f"Trying claude command: {cmd[0]}")
+                        result = subprocess.run(
+                            cmd,
+                            capture_output=True, 
+                            text=True, 
+                            timeout=30,
+                            cwd=pathlib.Path.cwd(),
+                            shell=True
+                        )
+                        if result.returncode == 0:
+                            self._log_debug(f"Claude command succeeded with: {cmd[0]}")
+                            break
+                        else:
+                            self._log_debug(f"Claude command {cmd[0]} failed with code {result.returncode}: {result.stderr}")
+                    except Exception as e:
+                        self._log_debug(f"Claude command {cmd[0]} exception: {e}")
+                        continue
+                
+                if not result or result.returncode != 0:
+                    self._log_debug("All claude commands failed")
+                    raise Exception("All claude command variations failed")
                 
                 if result.returncode == 0:
                     raw_response = result.stdout.strip()
