@@ -592,10 +592,20 @@ Output only the commit message:"""
                 # Use shell=True on Windows to handle .cmd files properly
                 # Use new LLM utility for cost-efficient queries (Claude 3.5 Haiku)
                 try:
-                    from .llms import ask_concise
+                    from .llms import LLMClient
+                    
+                    # Create LLM client with specific system prompt for commit messages
+                    llm = LLMClient()
+                    commit_system_prompt = (
+                        "You are a git commit message generator. "
+                        "Generate ONLY a conventional commit message in the format: type(scope): description. "
+                        "No explanations, no conversation, no questions. "
+                        "Just output the commit message directly."
+                    )
+                    
                     # Debug: Log what we're sending to LLM utility
                     self._log_debug(f"Sending to LLM utility (first 200 chars): {task_prompt[:200]}...")
-                    response = ask_concise(task_prompt)
+                    response = llm.ask(task_prompt, max_tokens=50, system_prompt=commit_system_prompt)
                     self._log_debug(f"✅ LLM utility success: {response}")
                     
                     # Check if this is the hardcoded fallback
