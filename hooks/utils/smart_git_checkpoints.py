@@ -420,9 +420,6 @@ class SmartGitCheckpoints:
         
         prompt = self._build_ai_prompt(tool_context, session_context, git_context, tool_history)
         
-        # Debug: Log the prompt being sent to LLM
-        self._log_debug(f"Generated prompt for LLM: {prompt[:500]}...")
-        
         try:
             # Call Claude Code Task tool for intelligent commit generation
             response = self._call_claude_task(prompt)
