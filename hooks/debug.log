@@ -410,3 +410,67 @@ Context:
 2025-07-20T01:03:55.826711 - SmartCheckpoint: Claude command succeeded with: claude.cmd
 2025-07-20T01:03:55.826711 - SmartCheckpoint: Claude Task raw response: I'll help generate a git commit message based on t...
 2025-07-20T01:03:55.826711 - SmartCheckpoint: Claude Task cleaned: chore(git): update smart checkpoint logging
+2025-07-20T01:03:55.916621 - SmartCheckpoint:  Smart commit created: chore(git): update smart checkpoint logging
+{
+  "timestamp": "2025-07-20T01:03:58.931819",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "23145f25-c11c-464b-be74-9b937b1d10ef",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\23145f25-c11c-464b-be74-9b937b1d10ef.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:04:01.204948 - LLMClient: Claude timeout (6s)
+2025-07-20T01:04:01.204948 - LLMClient: ❌ LLM error: Claude timeout
+2025-07-20T01:04:01.204948 - LLMClient: Trying fallback: claude-3-5-sonnet-20241022
+2025-07-20T01:04:01.204948 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-sonnet-20241022 --output-format @prompt (709 chars)
+2025-07-20T01:04:01.204948 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+{
+  "timestamp": "2025-07-20T01:04:18.801422",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "7e3d8c84-a094-4126-a529-a2da7a23a5c1",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\7e3d8c84-a094-4126-a529-a2da7a23a5c1.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:04:21.064934 - LLMClient: Claude timeout (6s)
+2025-07-20T01:04:21.064934 - LLMClient: Fallback claude-3-5-sonnet-20241022 failed: Claude timeout
+2025-07-20T01:04:21.065875 - LLMClient: All AI models failed, using manual fallback
+2025-07-20T01:04:21.065875 - SmartCheckpoint: ⚡ Fast LLM call completed in 30.45s
+2025-07-20T01:04:21.065875 - SmartCheckpoint: ✅ LLM utility success: chore: update files
+2025-07-20T01:04:21.065875 - SmartCheckpoint: LLM returned hardcoded fallback, trying direct claude command
+2025-07-20T01:04:21.066939 - SmartCheckpoint: Trying claude command: claude
+{
+  "timestamp": "2025-07-20T01:04:28.239260",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "85672559-2373-44bd-9b5d-24d985c79fc7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\85672559-2373-44bd-9b5d-24d985c79fc7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:04:30.480533 - SmartCheckpoint: Claude command succeeded with: claude
+2025-07-20T01:04:30.480533 - SmartCheckpoint: Claude Task raw response: I understand that plan mode is active, and I'll he...
+2025-07-20T01:04:30.480533 - SmartCheckpoint: Claude Task cleaned: chore: update files
