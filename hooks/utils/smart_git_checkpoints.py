@@ -593,11 +593,16 @@ Output only the commit message:"""
                 # Use new LLM utility for cost-efficient queries (Claude 3.5 Haiku)
                 try:
                     from .llms import ask_concise
+                    # Debug: Log what we're sending to LLM utility
+                    self._log_debug(f"Sending to LLM utility (first 200 chars): {task_prompt[:200]}...")
                     response = ask_concise(task_prompt)
                     self._log_debug(f"✅ LLM utility success: {response}")
                     
-                    # Validate response is not a fallback
-                    if response and response != "AI response unavailable" and len(response) > 10:
+                    # Check if this is the hardcoded fallback
+                    if response == "chore: update files":
+                        self._log_debug("LLM returned hardcoded fallback, trying direct claude command")
+                    elif response and response != "AI response unavailable" and len(response) > 10:
+                        self._log_debug(f"LLM gave meaningful response: {response}")
                         return response
                     else:
                         self._log_debug("LLM response appears to be fallback, trying original method")
