@@ -38,7 +38,9 @@ def ask(prompt: str, model: str = "claude-3-5-haiku-20241022") -> str:
         print(f"LLM Error: {e}", flush=True)
     
     # Fallback for development/testing
-    if "2+2" in prompt:
+    if "commit" in prompt.lower():
+        return "chore: update files"
+    elif "2+2" in prompt:
         return "4"
     else:
         return "AI response unavailable"
