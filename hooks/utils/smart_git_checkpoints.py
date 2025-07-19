@@ -663,13 +663,15 @@ COMMIT MESSAGE:"""
                 for cmd in claude_commands:
                     try:
                         self._log_debug(f"Trying claude command: {cmd[0]}")
+                        # Use cmd.exe explicitly to avoid bash issues on Windows
+                        cmd_command = " ".join(f'"{arg}"' if " " in str(arg) else str(arg) for arg in cmd)
+                        
                         result = subprocess.run(
-                            cmd,
+                            ["cmd.exe", "/c", cmd_command],
                             capture_output=True, 
                             text=True, 
-                            timeout=30,
-                            cwd=pathlib.Path.cwd(),
-                            shell=True
+                            timeout=10,  # Shorter timeout since this is fallback
+                            cwd=pathlib.Path.cwd()
                         )
                         if result.returncode == 0:
                             self._log_debug(f"Claude command succeeded with: {cmd[0]}")
