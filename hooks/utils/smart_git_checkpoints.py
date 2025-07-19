@@ -602,18 +602,18 @@ COMMIT MESSAGE:"""
                 try:
                     from .llms import LLMClient
                     
-                    # Create LLM client with specific system prompt for commit messages
+                    # Create LLM client with more specific system prompt
                     llm = LLMClient()
                     commit_system_prompt = (
-                        "You are a git commit message generator. "
-                        "Generate ONLY a conventional commit message in the format: type(scope): description. "
-                        "No explanations, no conversation, no questions. "
-                        "Just output the commit message directly."
+                        "You are a commit message generator. Output only the commit message in this exact format: "
+                        "type(scope): description. No conversation, no explanations, no questions. "
+                        "Examples: 'fix(auth): handle login errors', 'feat(ui): add search bar', 'chore: update deps'. "
+                        "Output ONLY the commit message."
                     )
                     
                     # Debug: Log what we're sending to LLM utility
                     self._log_debug(f"Sending to LLM utility (first 200 chars): {task_prompt[:200]}...")
-                    response = llm.ask(task_prompt, max_tokens=50, system_prompt=commit_system_prompt)
+                    response = llm.ask(task_prompt, model="claude-3-5-haiku-20241022", max_tokens=30, system_prompt=commit_system_prompt)
                     self._log_debug(f"✅ LLM utility success: {response}")
                     
                     # Check if this is the hardcoded fallback
