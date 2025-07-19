@@ -13,6 +13,7 @@ import sys
 import pathlib
 import datetime
 from utils.smart_voice_notify import process_stop_notification
+from utils.smart_git_checkpoints import SmartGitCheckpoint
 
 def main() -> None:
     """
