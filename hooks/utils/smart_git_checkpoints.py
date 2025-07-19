@@ -428,16 +428,8 @@ class SmartGitCheckpoints:
             # Clean and validate AI response
             if commit_message and len(commit_message) > 5:
                 cleaned_message = self._clean_commit_message(commit_message)
-                
-                # Check if it's actually a meaningful response vs fallback
-                if cleaned_message and "chore: update files" not in cleaned_message.lower():
-                    self._log_debug(f"LLM generated meaningful commit: {cleaned_message}")
-                    return cleaned_message
-                else:
-                    self._log_debug(f"LLM returned generic response: {cleaned_message}, trying fallback")
-                    return self._create_fallback_commit(tool_context, git_context)
+                return cleaned_message
             else:
-                self._log_debug(f"LLM response too short: {commit_message}")
                 return self._create_fallback_commit(tool_context, git_context)
                 
         except Exception as e:

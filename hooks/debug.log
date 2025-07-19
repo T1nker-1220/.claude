@@ -871,3 +871,10 @@ Rules:
 2025-07-20T00:26:09.515287 - SmartCheckpoint: Loaded tool history: 10 operations, 10 file ops
 2025-07-20T00:26:09.639933 - SmartCheckpoint: ✅ LLM utility success: chore: update files
 2025-07-20T00:26:09.640931 - SmartCheckpoint: LLM returned generic response: chore: update files, trying fallback
+2025-07-20T00:26:09.721136 - SmartCheckpoint:  Smart commit created: chore: update debug.log +2 more
+2025-07-20T00:26:25.234923 - SmartCheckpoint: Tool context: Edit, success: True, response: {'filePath': 'C:\\Users\\NATH\\.claude\\hooks\\utils\\smart_git_checkpoints.py', 'oldString': '     ...
+2025-07-20T00:26:25.235923 - SmartCheckpoint: Checkpoint decision: tool=Edit, success=True, should_checkpoint=True
+2025-07-20T00:26:25.244929 - SmartCheckpoint: Reading transcript with 260 lines...
+2025-07-20T00:26:25.245934 - SmartCheckpoint: No user messages found in transcript
+2025-07-20T00:26:25.254410 - SmartCheckpoint: Loaded tool history: 10 operations, 10 file ops
+2025-07-20T00:26:25.385733 - SmartCheckpoint: ✅ LLM utility success: chore: update files
