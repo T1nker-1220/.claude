@@ -618,9 +618,9 @@ COMMIT MESSAGE:"""
                     import time
                     start_time = time.time()
                     
-                    # Override LLM client timeout for this call (6s max to avoid Stop hook at ~7s)
+                    # Override LLM client timeout for this call (8s to allow completion before Stop hook)
                     original_timeout = llm.config.default_timeout
-                    llm.config.default_timeout = 6
+                    llm.config.default_timeout = 8
                     
                     try:
                         response = llm.ask(task_prompt, model="claude-3-5-haiku-20241022", max_tokens=30, system_prompt=commit_system_prompt)

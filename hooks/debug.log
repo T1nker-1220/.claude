@@ -474,3 +474,123 @@ Context:
 2025-07-20T01:04:30.480533 - SmartCheckpoint: Claude command succeeded with: claude
 2025-07-20T01:04:30.480533 - SmartCheckpoint: Claude Task raw response: I understand that plan mode is active, and I'll he...
 2025-07-20T01:04:30.480533 - SmartCheckpoint: Claude Task cleaned: chore: update files
+2025-07-20T01:04:30.534969 - SmartCheckpoint:  Smart commit created: chore: update files
+{
+  "timestamp": "2025-07-20T01:04:54.172966",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\c4e017a9-a989-427b-899c-b4e42c1011b7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+{
+  "timestamp": "2025-07-20T01:08:43.567332",
+  "event": "hook_triggered",
+  "payload": {
+    "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\c4e017a9-a989-427b-899c-b4e42c1011b7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Notification",
+    "message": "Claude needs your permission to use Read"
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Notification"
+  }
+}
+================================================================================
+2025-07-20T01:09:06.033965 - SmartCheckpoint: Tool context: Edit, success: True, response: {'filePath': 'C:\\Users\\NATH\\.claude\\hooks\\utils\\smart_git_checkpoints.py', 'oldString': '     ...
+2025-07-20T01:09:06.033965 - SmartCheckpoint: Checkpoint decision: tool=Edit, success=True, should_checkpoint=True
+2025-07-20T01:09:06.041785 - SmartCheckpoint: Reading transcript with 132 lines...
+2025-07-20T01:09:06.041785 - SmartCheckpoint: No user messages found in transcript
+2025-07-20T01:09:06.053230 - SmartCheckpoint: Loaded tool history: 8 operations, 10 file ops
+2025-07-20T01:09:06.086605 - SmartCheckpoint: Generated prompt for LLM (first 300 chars): Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit
+- Session activity: editing files on smart_git_checkpoints.py
+- Change: Changed: '                    # Override LLM client timeout for this call ...
+2025-07-20T01:09:06.099884 - SmartCheckpoint: Sending to LLM utility (first 200 chars): TASK: Generate a git commit message.
+
+CONTEXT:
+Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit...
+2025-07-20T01:09:06.099884 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-haiku-20241022 --output-format @prompt (709 chars)
+2025-07-20T01:09:06.099884 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+{
+  "timestamp": "2025-07-20T01:09:13.346616",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "601403e3-8da0-427a-be39-c35e96dc5fa8",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\601403e3-8da0-427a-be39-c35e96dc5fa8.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:09:15.626001 - LLMClient: Claude timeout (8s)
+2025-07-20T01:09:15.627505 - LLMClient: ❌ LLM error: Claude timeout
+2025-07-20T01:09:15.627505 - LLMClient: Trying fallback: claude-3-5-sonnet-20241022
+2025-07-20T01:09:15.627505 - LLMClient: Calling: C:\Users\NATH\AppData\Local\pnpm\claude.CMD --model claude-3-5-sonnet-20241022 --output-format @prompt (709 chars)
+2025-07-20T01:09:15.628509 - LLMClient: Executing: C:\Users\NATH\AppData\Local\pnpm\claude.CMD with 8 args
+{
+  "timestamp": "2025-07-20T01:09:27.399498",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "1a40bb3f-0290-40cf-891e-188fcdeebfd3",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\1a40bb3f-0290-40cf-891e-188fcdeebfd3.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:09:29.662032 - LLMClient: Claude timeout (8s)
+2025-07-20T01:09:29.662032 - LLMClient: Fallback claude-3-5-sonnet-20241022 failed: Claude timeout
+2025-07-20T01:09:29.662032 - LLMClient: All AI models failed, using manual fallback
+2025-07-20T01:09:29.662032 - SmartCheckpoint: ⚡ Fast LLM call completed in 23.56s
+2025-07-20T01:09:29.662032 - SmartCheckpoint: ✅ LLM utility success: chore: update files
+2025-07-20T01:09:29.663032 - SmartCheckpoint: LLM returned hardcoded fallback, trying direct claude command
+2025-07-20T01:09:29.663032 - SmartCheckpoint: Trying claude command: claude
+{
+  "timestamp": "2025-07-20T01:09:37.025740",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "b0cdbeb6-8e67-4129-8469-013321cce400",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\b0cdbeb6-8e67-4129-8469-013321cce400.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T01:09:39.278788 - SmartCheckpoint: Claude command succeeded with: claude
+2025-07-20T01:09:39.278788 - SmartCheckpoint: Claude Task raw response: I understand that plan mode is active, and I will ...
+2025-07-20T01:09:39.278788 - SmartCheckpoint: Claude Task cleaned: chore: update files
