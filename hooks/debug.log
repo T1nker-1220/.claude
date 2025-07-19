@@ -878,3 +878,90 @@ Rules:
 2025-07-20T00:26:25.245934 - SmartCheckpoint: No user messages found in transcript
 2025-07-20T00:26:25.254410 - SmartCheckpoint: Loaded tool history: 10 operations, 10 file ops
 2025-07-20T00:26:25.385733 - SmartCheckpoint: ✅ LLM utility success: chore: update files
+2025-07-20T00:26:25.470113 - SmartCheckpoint:  Smart commit created: chore: update files
+{
+  "timestamp": "2025-07-20T00:26:39.510629",
+  "event": "hook_triggered",
+  "payload": {
+    "session_id": "156a302f-9590-46e8-9e0f-1b3b6d31d18e",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\156a302f-9590-46e8-9e0f-1b3b6d31d18e.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Notification",
+    "message": "Claude needs your permission to use Update"
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Notification"
+  }
+}
+================================================================================
+{
+  "timestamp": "2025-07-20T00:28:43.448864",
+  "event": "hook_triggered",
+  "payload": {
+    "session_id": "156a302f-9590-46e8-9e0f-1b3b6d31d18e",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\156a302f-9590-46e8-9e0f-1b3b6d31d18e.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Notification",
+    "message": "Claude needs your permission to use context7 - resolve-library-id (MCP)"
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Notification"
+  }
+}
+================================================================================
+{
+  "timestamp": "2025-07-20T00:30:04.976411",
+  "event": "hook_triggered",
+  "payload": {
+    "session_id": "156a302f-9590-46e8-9e0f-1b3b6d31d18e",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\156a302f-9590-46e8-9e0f-1b3b6d31d18e.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Notification",
+    "message": "Claude needs your permission to use Fetch"
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Notification"
+  }
+}
+================================================================================
+{
+  "timestamp": "2025-07-20T00:30:54.981337",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "156a302f-9590-46e8-9e0f-1b3b6d31d18e",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\156a302f-9590-46e8-9e0f-1b3b6d31d18e.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+2025-07-20T00:34:08.794908 - SmartCheckpoint: Tool context: Edit, success: True, response: {'filePath': 'C:\\Users\\NATH\\.claude\\hooks\\utils\\smart_git_checkpoints.py', 'oldString': '     ...
+2025-07-20T00:34:08.794908 - SmartCheckpoint: Checkpoint decision: tool=Edit, success=True, should_checkpoint=True
+2025-07-20T00:34:08.804171 - SmartCheckpoint: Reading transcript with 297 lines...
+2025-07-20T00:34:08.804171 - SmartCheckpoint: No user messages found in transcript
+2025-07-20T00:34:08.804171 - SmartCheckpoint: Loaded tool history: 10 operations, 10 file ops
+2025-07-20T00:34:08.844919 - SmartCheckpoint: Generated prompt for LLM (first 300 chars): Generate a git commit message using conventional commit format.
+
+Context:
+- User request: file modification requested
+- File: debug.log
+- Operation: Edit
+- Session activity: editing files on smart_git_checkpoints.py, production_client.py
+- Change: Changed: '        prompt = self._build_ai_prompt(too...
+2025-07-20T00:34:08.853790 - LLMClient: Calling: /c/Users/NATH/AppData/Local/pnpm/claude --model claude-3-5-haiku-20241022 --output-format @prompt (406 chars)
+2025-07-20T00:34:08.853790 - LLMClient: Claude executable not found
+2025-07-20T00:34:08.853790 - LLMClient: ❌ LLM error: Claude executable not found
+2025-07-20T00:34:08.853790 - LLMClient: Trying fallback: claude-3-5-sonnet-20241022
+2025-07-20T00:34:08.853790 - LLMClient: Calling: /c/Users/NATH/AppData/Local/pnpm/claude --model claude-3-5-sonnet-20241022 --output-format @prompt (406 chars)
+2025-07-20T00:34:08.858582 - LLMClient: Claude executable not found
+2025-07-20T00:34:08.858582 - LLMClient: Fallback claude-3-5-sonnet-20241022 failed: Claude executable not found
+2025-07-20T00:34:08.858582 - LLMClient: All AI models failed, using manual fallback
+2025-07-20T00:34:08.859206 - SmartCheckpoint: ✅ LLM utility success: chore: update files
