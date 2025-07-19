@@ -160,28 +160,40 @@ class LLMClient:
                 
                 self._log_debug(f"Calling: {' '.join(args[:4])} @prompt ({len(prompt)} chars)")
                 
-                # Execute command - build command string for shell execution
-                command_str = " ".join(f'"{arg}"' if " " in arg else arg for arg in args)
-                
-                # Ensure proper environment with pnpm path
+                # Try direct execution without shell for better Windows compatibility
                 import os
                 env = os.environ.copy()
                 
-                # Add pnpm path if not already there
-                pnpm_path = r'C:\Users\NATH\AppData\Local\pnpm'
-                if 'PATH' in env and pnpm_path not in env['PATH']:
-                    env['PATH'] = pnpm_path + ';' + env['PATH']
-                elif 'PATH' not in env:
-                    env['PATH'] = pnpm_path
+                # Try to find the actual Claude executable
+                claude_exe = None
+                potential_paths = [
+                    r"C:\Users\NATH\AppData\Local\pnpm\claude.CMD",
+                    r"C:\Users\NATH\AppData\Roaming\npm\claude.cmd",
+                    "claude.cmd",
+                    "claude"
+                ]
+                
+                for path in potential_paths:
+                    if pathlib.Path(path).exists() or path in ["claude.cmd", "claude"]:
+                        claude_exe = path
+                        break
+                
+                if not claude_exe:
+                    raise FileNotFoundError("Claude executable not found in any expected location")
+                
+                # Build direct command arguments
+                cmd_args = [claude_exe] + args[1:]  # Skip the first arg which is the executable path
+                
+                self._log_debug(f"Executing: {cmd_args[0]} with {len(cmd_args)-1} args")
                 
                 result = subprocess.run(
-                    command_str,
+                    cmd_args,
                     capture_output=True,
                     text=True,
                     timeout=self.config.default_timeout,
                     cwd=pathlib.Path.cwd(),
-                    shell=True,
-                    env=env  # Use Windows shell, not bash
+                    shell=True,  # Use shell for .cmd files on Windows
+                    env=env
                 )
                 
                 if result.returncode == 0:
