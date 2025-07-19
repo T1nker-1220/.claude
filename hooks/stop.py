@@ -32,6 +32,9 @@ def main() -> None:
     # Log to logs directory
     log_to_logs_directory(payload)
     
+    # Process smart git checkpoints for the entire session
+    process_session_git_checkpoint(payload)
+    
     # Process using utility functions
     process_stop_notification(payload)
 
