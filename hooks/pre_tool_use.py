@@ -22,16 +22,10 @@ try:
     from smart_voice_notify import speak
     VOICE_AVAILABLE = True
 except ImportError:
-    try:
-        import pyttsx3
-        def speak(text: str):
-            eng = pyttsx3.init()
-            eng.setProperty("rate", 185)
-            eng.say(text)
-            eng.runAndWait()
-        VOICE_AVAILABLE = True
-    except ImportError:
-        VOICE_AVAILABLE = False
+    VOICE_AVAILABLE = False
+    def speak(text: str):
+        """Fallback if voice utilities unavailable"""
+        pass
 
 def main() -> None:
     """

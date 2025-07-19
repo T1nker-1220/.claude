@@ -14,15 +14,8 @@ Simple Usage:
     summary = ask_concise("Summarize this code")
 """
 
-# Import production-ready functions by default
-try:
-    from .production_client import ask as prod_ask, ask_concise as prod_ask_concise
-    # Use production client for better reliability
-    ask = prod_ask
-    ask_concise = prod_ask_concise
-except ImportError:
-    # Fallback to full client
-    from .client import ask, ask_concise
+# Import from the available client
+from .client import ask, ask_concise
 
 from .client import LLMClient, ask_json
 from .config import get_config, update_config, apply_preset, COST_PRESETS

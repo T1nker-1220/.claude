@@ -40,15 +40,12 @@ def main() -> None:
         process_notification(payload)
         
     except Exception as e:
-        # Fallback if processing fails - at least say something
-        import pyttsx3
+        # Fallback if processing fails - use centralized voice function
         try:
-            eng = pyttsx3.init()
-            eng.setProperty("rate", 185)
-            eng.say("Claude notification error")
-            eng.runAndWait()
+            from utils.smart_voice_notify import speak
+            speak("Claude notification error")
         except:
-            # If even basic TTS fails, just exit silently
+            # If even centralized TTS fails, just exit silently
             pass
 
 def log_to_logs_directory(payload) -> None:

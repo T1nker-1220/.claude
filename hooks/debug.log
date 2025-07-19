@@ -2,3 +2,60 @@
 2025-07-20T01:25:32.915244 - SmartCheckpoint: Loaded tool history: 10 operations, 10 file ops
 2025-07-20T01:25:32.946944 - SmartCheckpoint: 🚀 Session commit generation (unlimited time)
 2025-07-20T01:25:32.946944 - SmartCheckpoint: ✅ Using pattern-based commit: refactor: update 2 Python files
+2025-07-20T01:25:33.037437 - SmartCheckpoint:  Smart commit created: refactor: update 2 Python files
+2025-07-20T01:25:33.037437 - SmartCheckpoint: ✅ Session commit created: refactor: update 2 Python files
+{
+  "timestamp": "2025-07-20T01:25:33.038437",
+  "event": "stop_hook_triggered",
+  "payload": {
+    "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\c4e017a9-a989-427b-899c-b4e42c1011b7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Stop"
+  }
+}
+================================================================================
+{"timestamp": "2025-07-20T01:29:13.524327", "event": "DELETION_BLOCKED", "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7", "command": "cd \"C:\\Users\\NATH\\.claude\\hooks\" && rm subagent_stop.py user_prompt_submit.py", "reason": "rm command detected", "tool_name": "Bash", "cwd": "C:\\Users\\NATH\\.claude"}
+[2025-07-20T01:29:13.524327] PRE_TOOL_USE: Sending voice notification: Blocked dangerous command
+[2025-07-20T01:29:15.769658] PRE_TOOL_USE: Voice notification sent successfully
+{
+  "timestamp": "2025-07-20T01:30:47.121390",
+  "event": "hook_triggered",
+  "payload": {
+    "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\c4e017a9-a989-427b-899c-b4e42c1011b7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Notification",
+    "message": "Claude needs your permission to use Update"
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Notification"
+  }
+}
+================================================================================
+{
+  "timestamp": "2025-07-20T01:31:17.806351",
+  "event": "hook_triggered",
+  "payload": {
+    "session_id": "c4e017a9-a989-427b-899c-b4e42c1011b7",
+    "transcript_path": "C:\\Users\\NATH\\.claude\\projects\\C--Users-NATH--claude\\c4e017a9-a989-427b-899c-b4e42c1011b7.jsonl",
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_event_name": "Notification",
+    "message": "Claude needs your permission to use Update"
+  },
+  "environment": {
+    "cwd": "C:\\Users\\NATH\\.claude",
+    "hook_type": "Notification"
+  }
+}
+================================================================================
+2025-07-20T01:31:43.367803 - SmartCheckpoint: 🔄 Processing session checkpoint for c4e017a9-a989-427b-899c-b4e42c1011b7
+2025-07-20T01:31:43.391014 - SmartCheckpoint: Loaded tool history: 15 operations, 10 file ops
+2025-07-20T01:31:43.420930 - SmartCheckpoint: 🚀 Session commit generation (unlimited time)
+2025-07-20T01:31:43.420930 - SmartCheckpoint: ✅ Using pattern-based commit: refactor: update 4 Python files

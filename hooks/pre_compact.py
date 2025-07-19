@@ -19,24 +19,14 @@ sys.path.insert(0, str(utils_path))
 try:
     from smart_voice_notify import process_compact_notification
 except ImportError as e:
-    # Fallback if import fails
-    import pyttsx3
+    # Fallback if import fails - use simplified approach
     def fallback_speak(text: str):
-        eng = pyttsx3.init()
-        eng.setProperty("rate", 185)
-        eng.say(text)
-        eng.runAndWait()
+        """Simplified fallback TTS"""
+        pass
     
     def process_compact_notification(payload: dict):
-        # Simple fallback implementation
-        compact_type = "automatic"
-        if "manual" in str(payload).lower() or "user" in str(payload).lower():
-            compact_type = "manual"
-        
-        if compact_type == "automatic":
-            fallback_speak("Automatic compacting the conversation")
-        else:
-            fallback_speak("Manual compacting the conversation")
+        # Simple fallback implementation  
+        fallback_speak("Compacting the conversation")
 
 def main():
     """
@@ -63,13 +53,10 @@ def main():
         # Fallback for invalid JSON
         process_compact_notification({"compact_type": "automatic"})
     except Exception as e:
-        # Ultimate fallback - just speak something
+        # Ultimate fallback - use centralized voice if possible
         try:
-            import pyttsx3
-            eng = pyttsx3.init()
-            eng.setProperty("rate", 185)
-            eng.say("Compacting the conversation")
-            eng.runAndWait()
+            from smart_voice_notify import speak
+            speak("Compacting the conversation")
         except:
             # If all else fails, just exit silently
             pass
