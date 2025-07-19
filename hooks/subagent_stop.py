@@ -15,9 +15,14 @@ def main() -> None:
     SubagentStop hook to automatically chain tasks.
     If a new function is written, it prompts Claude to write a unit test.
     """
+    # Always log that we were called
+    log_debug("SubagentStop hook triggered")
+    
     try:
         payload = json.load(sys.stdin)
-    except json.JSONDecodeError:
+        log_debug(f"Received payload: {json.dumps(payload, indent=2)}")
+    except json.JSONDecodeError as e:
+        log_debug(f"Failed to parse JSON payload: {e}")
         # If there's no payload, there's nothing to do.
         print(json.dumps({"decision": "approve"}))
         sys.exit(0)
