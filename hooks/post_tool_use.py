@@ -10,12 +10,11 @@ import json
 import sys
 import pathlib
 import datetime
-from utils.smart_git_checkpoints import process_tool_checkpoint
 
 def main() -> None:
     """
-    Simplified PostToolUse hook handler - YouTuber's approach.
-    Directly processes smart git checkpoints from transcript data.
+    Simplified PostToolUse hook handler.
+    Now just logs tool usage - smart commits moved to Stop hook to avoid timing issues.
     """
     try:
         # Read JSON payload from stdin
@@ -28,14 +27,12 @@ def main() -> None:
         sys.exit(1)
     
     try:
-        # Log tool usage to logs directory
+        # Just log tool usage to logs directory
+        # Smart git commits now happen in Stop hook (no timing constraints)
         log_to_logs_directory(payload)
         
-        # Process smart checkpoint creation directly from transcript
-        checkpoint_success = process_tool_checkpoint(payload)
-        
         # Exit with success
-        sys.exit(0 if checkpoint_success else 1)
+        sys.exit(0)
         
     except Exception as e:
         print(f"Hook processing error: {e}", file=sys.stderr)

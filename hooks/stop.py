@@ -13,7 +13,7 @@ import sys
 import pathlib
 import datetime
 from utils.smart_voice_notify import process_stop_notification
-from utils.smart_git_checkpoints import SmartGitCheckpoint
+from utils.smart_git_checkpoints import SmartGitCheckpoints
 
 def main() -> None:
     """
@@ -52,7 +52,7 @@ def process_session_git_checkpoint(payload) -> None:
             return
             
         # Create smart checkpoint processor
-        checkpoint = SmartGitCheckpoint()
+        checkpoint = SmartGitCheckpoints()
         
         # Process the entire session at once
         # This is much better than processing individual tools
