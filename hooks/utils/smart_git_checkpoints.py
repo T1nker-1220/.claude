@@ -565,7 +565,7 @@ Generate ONLY the commit message:"""
             self._log_debug(f"Commit creation error: {e}")
             return False
     
-    def _call_claude_task(self, prompt: str) -> str:
+    def _call_claude_task(self, prompt: str, tool_context: Dict[str, Any] = None, git_context: Dict[str, Any] = None) -> str:
         """Call Claude Code Task tool to generate intelligent commit message."""
         try:
             # Create a temporary file with the prompt
