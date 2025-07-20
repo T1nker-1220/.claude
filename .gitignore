@@ -1,0 +1,16 @@
+projects/
+statsig/
+todos/
+.credentials.json
+.superclaude-metadata.json
+!README.md
+ide
+.claude/
+backups/
+*.pyc
+logs/
+debug-hooks.log
+repomix-output.xml
+*.log
+debug.log
+hooks/debug.log
