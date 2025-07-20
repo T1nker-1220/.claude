@@ -11,7 +11,7 @@ import json, os, sys, pyttsx3, pathlib, itertools, random
 
 def speak(text: str, voice_index: int = None) -> None:
     eng = pyttsx3.init()        # Windows SAPI-5 voice
-    voices = eng.getProperty('zira')
+    voices = eng.getProperty('voices')
     
     # Manual voice selection override
     if voice_index is not None and voices and 0 <= voice_index < len(voices):
