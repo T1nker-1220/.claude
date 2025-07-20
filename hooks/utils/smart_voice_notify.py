@@ -4,12 +4,47 @@
 # dependencies = [
 #   "pyttsx3>=2.99",
 #   "pywin32>=306",
+#   "edge-tts>=6.1.0",
 # ]
 # ///
 
 import json, os, sys, pyttsx3, pathlib, itertools, random
+import asyncio
+import tempfile
+import subprocess
 
-def speak(text: str, voice_index: int = 1) -> None:
+async def speak_edge(text: str, voice: str = "en-US-JennyNeural") -> None:
+    """Use Edge TTS for high-quality natural voices"""
+    try:
+        import edge_tts
+        
+        # Create a temporary file for the audio
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp_file:
+            tmp_path = tmp_file.name
+        
+        # Generate speech using Edge TTS
+        communicate = edge_tts.Communicate(text, voice)
+        await communicate.save(tmp_path)
+        
+        # Play the audio file
+        subprocess.run(["powershell", "-c", f"(New-Object Media.SoundPlayer '{tmp_path}').PlaySync()"], 
+                      capture_output=True, check=False)
+        
+        # Clean up
+        try:
+            os.unlink(tmp_path)
+        except:
+            pass
+            
+    except ImportError:
+        # Fallback to pyttsx3 if edge-tts is not available
+        speak_pyttsx3(text, 1)
+    except Exception:
+        # Fallback to pyttsx3 on any error
+        speak_pyttsx3(text, 1)
+
+def speak_pyttsx3(text: str, voice_index: int = 1) -> None:
+    """Original pyttsx3 implementation as fallback"""
     eng = pyttsx3.init()        # Windows SAPI-5 voice
     voices = eng.getProperty('voices')
     
@@ -35,6 +70,15 @@ def speak(text: str, voice_index: int = 1) -> None:
     eng.setProperty("rate", 185)
     eng.say(text)
     eng.runAndWait()
+
+def speak(text: str, voice: str = "en-GB-SoniaNeural") -> None:
+    """Main speak function - uses Edge TTS for better quality"""
+    try:
+        # Run the async Edge TTS function
+        asyncio.run(speak_edge(text, voice))
+    except Exception:
+        # Fallback to pyttsx3
+        speak_pyttsx3(text, 1)
 
 # Removed get_dynamic_notification - using random variations instead
 
