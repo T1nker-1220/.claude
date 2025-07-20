@@ -9,7 +9,7 @@
 
 import json, os, sys, pyttsx3, pathlib, itertools, random
 
-def speak(text: str, voice_index: int = 2) -> None:
+def speak(text: str, voice_index: int = 3) -> None:
     eng = pyttsx3.init()        # Windows SAPI-5 voice
     voices = eng.getProperty('voices')
     
