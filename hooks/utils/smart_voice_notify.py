@@ -33,10 +33,16 @@ async def speak_edge(text: str, voice: str = "en-US-JennyNeural") -> None:
     except:
         pass
 
-
 def speak(text: str, voice: str = "en-GB-SoniaNeural") -> None:
-    """Main speak function - uses Edge TTS for better quality"""
-    asyncio.run(speak_edge(text, voice))
+    """Main speak function - uses Edge TTS with fallback"""
+    try:
+        asyncio.run(speak_edge(text, voice))
+    except (ImportError, ModuleNotFoundError):
+        # Fallback: silent operation if edge_tts not available
+        pass
+    except Exception:
+        # Fallback: silent operation on any other error
+        pass
 
 # Removed get_dynamic_notification - using random variations instead
 
