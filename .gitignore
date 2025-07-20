@@ -14,3 +14,5 @@ repomix-output.xml
 *.log
 debug.log
 hooks/debug.log
+.vscode/
+logs/
