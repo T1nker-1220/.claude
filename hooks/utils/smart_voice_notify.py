@@ -7,8 +7,7 @@
 # ]
 # ///
 
-import json, os, sys, pyttsx3, pathlib, itertools
-from utils.llms import ask_concise
+import json, os, sys, pyttsx3, pathlib, itertools, random
 
 def speak(text: str, voice_index: int = None) -> None:
     eng = pyttsx3.init()        # Windows SAPI-5 voice
@@ -37,92 +36,115 @@ def speak(text: str, voice_index: int = None) -> None:
     eng.say(text)
     eng.runAndWait()
 
-def get_dynamic_notification(tool: str, summary: str) -> str:
-    """Generate a friendly, dynamic voice notification using an LLM."""
-    if not summary:
-        return "" # Can't generate a notification without a summary
-
-    try:
-        # We use a very specific prompt to get a short, conversational response.
-        prompt = (
-            f"You are a voice assistant for a programmer. Create a very short, friendly notification "
-            f"(under 12 words) for the following completed action. Be conversational. "
-            f"Do not say 'task completed'.\n\n"
-            f"Tool Used: '{tool}'\n"
-            f"Action Summary: '{summary}'\n\n"
-            f"Example: If the summary is 'Modified file: auth.py', a good response would be "
-            f"'Okay, I've just updated the auth file for you.'\n\n"
-            f"Your notification:"
-        )
-        
-        # Use the cost-efficient LLM utility
-        notification_text = ask_concise(prompt)
-        
-        if notification_text and "unavailable" not in notification_text:
-            return notification_text
-        return ""
-    except Exception:
-        # If the LLM call fails for any reason, return an empty string
-        # The system will then fall back to the simple notification
-        return ""
+# Removed get_dynamic_notification - using random variations instead
 
 def get_simple_notification(context: str, tool: str) -> str:
-    """Generate simple, direct voice notifications for each tool."""
+    """Generate varied voice notifications for each tool with random selection."""
     if context == "permission_request":
-        # Simple permission requests
-        tool_messages = {
-            "Read": "Permission for Read",
-            "Write": "Permission for Write", 
-            "Edit": "Permission for Edit",
-            "MultiEdit": "Permission for MultiEdit",
-            "Bash": "Permission for Bash",
-            "LS": "Permission for LS",
-            "Grep": "Permission for Grep",
-            "Glob": "Permission for Glob",
-            "Update": "Permission for Update",
-            "Task": "Permission for Task",
-            "Plan": "Permission for Plan"
+        # Multiple permission request variations
+        permission_variations = {
+            "Read": ["Permission for Read", "Claude wants to read a file", "Requesting read access", "Need permission to read"],
+            "Write": ["Permission for Write", "Claude wants to write a file", "Requesting write access", "Need permission to write"],
+            "Edit": ["Permission for Edit", "Claude wants to edit a file", "Requesting edit access", "Need permission to edit"],
+            "MultiEdit": ["Permission for MultiEdit", "Claude wants to edit multiple files", "Requesting multi-edit access", "Need permission for batch editing"],
+            "Bash": ["Permission for Bash", "Claude wants to run a command", "Requesting terminal access", "Need permission for command"],
+            "LS": ["Permission for LS", "Claude wants to list files", "Requesting directory access", "Need permission to browse"],
+            "Grep": ["Permission for Grep", "Claude wants to search files", "Requesting search access", "Need permission to search"],
+            "Glob": ["Permission for Glob", "Claude wants to find files", "Requesting file search", "Need permission to locate files"],
+            "Update": ["Permission for Update", "Claude wants to update", "Requesting update access", "Need permission to update"],
+            "Task": ["Permission for Task", "Claude wants to delegate", "Requesting task access", "Need permission for sub-task"],
+            "Plan": ["Permission for Plan", "Claude wants to plan", "Requesting planning access", "Need permission to plan"]
         }
-        return tool_messages.get(tool, f"Permission for {tool}")
+        variations = permission_variations.get(tool, [f"Permission for {tool}", f"Claude needs {tool} access"])
+        return random.choice(variations)
     
     elif context == "tool_completion":
-        # Simple completion messages
-        tool_messages = {
-            "Read": "Read complete",
-            "Write": "Write complete",
-            "Edit": "Edit complete", 
-            "MultiEdit": "MultiEdit complete",
-            "Bash": "Command complete",
-            "LS": "Directory listed",
-            "Grep": "Search complete",
-            "Glob": "Files found",
-            "Update": "Update complete",
-            "Task": "Task complete"
+        # Multiple completion message variations
+        completion_variations = {
+            "Read": ["Read complete", "File loaded", "Reading finished", "Got the file content"],
+            "Write": ["Write complete", "File saved", "Writing finished", "File created successfully"],
+            "Edit": ["Edit complete", "File updated", "Changes saved", "Editing finished"],
+            "MultiEdit": ["MultiEdit complete", "Multiple files updated", "Batch editing done", "All changes saved"],
+            "Bash": ["Command complete", "Terminal finished", "Command executed", "Shell operation done"],
+            "LS": ["Directory listed", "Files enumerated", "Listing complete", "Directory scanned"],
+            "Grep": ["Search complete", "Matches found", "Search finished", "Pattern search done"],
+            "Glob": ["Files found", "Pattern matched", "File search complete", "Globbing finished"],
+            "Update": ["Update complete", "Successfully updated", "Update finished", "Changes applied"],
+            "Task": ["Task complete", "Sub-task finished", "Delegation done", "Task executed"]
         }
-        return tool_messages.get(tool, f"{tool} complete")
+        variations = completion_variations.get(tool, [f"{tool} complete", f"{tool} finished", f"{tool} done"])
+        return random.choice(variations)
     
     elif context == "session_end":
+        session_variations = []
         if tool and any(keyword in tool.lower() for keyword in ["commit", "git", "file"]):
-            return "Session complete with changes"
-        return "Claude session complete"
+            session_variations = [
+                "Session complete with changes",
+                "Work finished, changes saved", 
+                "Claude done, files updated",
+                "Session ended, work committed"
+            ]
+        else:
+            session_variations = [
+                "Claude session complete",
+                "Work finished successfully",
+                "Claude session ended",
+                "All done, session closed"
+            ]
+        return random.choice(session_variations)
     
     elif context == "error_notification":
-        return "Error occurred"
+        error_variations = [
+            "Error occurred",
+            "Something went wrong",
+            "Claude encountered an issue",
+            "Operation failed"
+        ]
+        return random.choice(error_variations)
     
     elif context == "waiting":
-        return "Claude ready"
+        waiting_variations = [
+            "Claude ready",
+            "Ready for input",
+            "Claude standing by",
+            "Waiting for instructions"
+        ]
+        return random.choice(waiting_variations)
     
     elif context == "compact_notification":
-        # Extract compact type from tool parameter
         if "automatic" in tool.lower():
-            return "Automatic compacting the conversation"
+            auto_variations = [
+                "Automatically compacting conversation",
+                "Auto-compacting the chat",
+                "Conversation being compressed",
+                "Auto-tidying the session"
+            ]
+            return random.choice(auto_variations)
         elif "manual" in tool.lower():
-            return "Manual compacting the conversation"
+            manual_variations = [
+                "Manually compacting conversation", 
+                "Compacting on request",
+                "User-triggered compression",
+                "Manual conversation cleanup"
+            ]
+            return random.choice(manual_variations)
         else:
-            return "Compacting the conversation"
+            general_variations = [
+                "Compacting the conversation",
+                "Tidying up the chat",
+                "Conversation cleanup",
+                "Compressing the session"
+            ]
+            return random.choice(general_variations)
     
     else:
-        return "Claude notification"
+        general_variations = [
+            "Claude notification",
+            "Claude update",
+            "System message",
+            "Claude alert"
+        ]
+        return random.choice(general_variations)
 
 def get_fallback_response(context: str, tool: str) -> str:
     """
@@ -442,7 +464,7 @@ def generate_tool_summary(tool: str, tool_input: dict, tool_response: any) -> st
 
 def list_available_voices() -> None:
     """List all available voices on the system for user selection."""
-    print("🎤 Available voices on your system:")
+    print("Available voices on your system:")
     eng = pyttsx3.init()
     voices = eng.getProperty('voices')
     
@@ -456,7 +478,7 @@ def list_available_voices() -> None:
         print("No voices found!")
     
     # Test the current voice selection
-    print("🔊 Testing current voice selection...")
+    print("Testing current voice selection...")
     speak("Hello! This is your Claude Code voice assistant.")
 
 def test_voice_notification() -> None:
@@ -568,19 +590,10 @@ def process_notification(payload: dict) -> None:
         speak("Claude notification received.")
         return
 
-    # --- NEW DYNAMIC LOGIC ---
-    final_text = ""
-    # 1. Try to generate a dynamic notification first
-    if context == "tool_completion":
-        dynamic_text = get_dynamic_notification(tool, result_summary)
-        if dynamic_text:
-            final_text = dynamic_text
-            
-    # 2. If dynamic generation failed or isn't applicable, use the simple one
-    if not final_text:
-        final_text = get_simple_notification(context, tool)
+    # Generate notification with random variations
+    final_text = get_simple_notification(context, tool)
     
-    # 3. Final fallback to ensure we always say something
+    # Final fallback to ensure we always say something
     final_text = final_text or "Claude notification"
     speak(final_text)
 
