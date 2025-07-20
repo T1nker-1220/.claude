@@ -2,83 +2,41 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#   "pyttsx3>=2.99",
-#   "pywin32>=306",
 #   "edge-tts>=6.1.0",
 # ]
 # ///
 
-import json, os, sys, pyttsx3, pathlib, itertools, random
+import json, os, pathlib, random
 import asyncio
 import tempfile
 import subprocess
 
 async def speak_edge(text: str, voice: str = "en-US-JennyNeural") -> None:
     """Use Edge TTS for high-quality natural voices"""
+    import edge_tts
+    
+    # Create a temporary file for the audio
+    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp_file:
+        tmp_path = tmp_file.name
+    
+    # Generate speech using Edge TTS
+    communicate = edge_tts.Communicate(text, voice)
+    await communicate.save(tmp_path)
+    
+    # Play the audio file
+    subprocess.run(["powershell", "-c", f"(New-Object Media.SoundPlayer '{tmp_path}').PlaySync()"], 
+                  capture_output=True, check=False)
+    
+    # Clean up
     try:
-        import edge_tts
-        
-        # Create a temporary file for the audio
-        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp_file:
-            tmp_path = tmp_file.name
-        
-        # Generate speech using Edge TTS
-        communicate = edge_tts.Communicate(text, voice)
-        await communicate.save(tmp_path)
-        
-        # Play the audio file
-        subprocess.run(["powershell", "-c", f"(New-Object Media.SoundPlayer '{tmp_path}').PlaySync()"], 
-                      capture_output=True, check=False)
-        
-        # Clean up
-        try:
-            os.unlink(tmp_path)
-        except:
-            pass
-            
-    except ImportError:
-        # Fallback to pyttsx3 if edge-tts is not available
-        speak_pyttsx3(text, 1)
-    except Exception:
-        # Fallback to pyttsx3 on any error
-        speak_pyttsx3(text, 1)
+        os.unlink(tmp_path)
+    except:
+        pass
 
-def speak_pyttsx3(text: str, voice_index: int = 1) -> None:
-    """Original pyttsx3 implementation as fallback"""
-    eng = pyttsx3.init()        # Windows SAPI-5 voice
-    voices = eng.getProperty('voices')
-    
-    # Manual voice selection override
-    if voice_index is not None and voices and 0 <= voice_index < len(voices):
-        eng.setProperty('voice', voices[voice_index].id)
-    elif voices:
-        # Automatic voice selection - try to find a female voice or different one
-        preferred_voices = []
-        for voice in voices:
-            voice_name = voice.name.lower()
-            # Look for female voices or specific good voices
-            if any(keyword in voice_name for keyword in ['zira', 'hazel', 'helen', 'female', 'woman']):
-                preferred_voices.append(voice)
-        
-        # If we found preferred voices, use the first one
-        if preferred_voices:
-            eng.setProperty('voice', preferred_voices[0].id)
-        # Otherwise, use the second voice if available (usually different from default)
-        elif len(voices) > 1:
-            eng.setProperty('voice', voices[1].id)
-    
-    eng.setProperty("rate", 185)
-    eng.say(text)
-    eng.runAndWait()
 
 def speak(text: str, voice: str = "en-GB-SoniaNeural") -> None:
     """Main speak function - uses Edge TTS for better quality"""
-    try:
-        # Run the async Edge TTS function
-        asyncio.run(speak_edge(text, voice))
-    except Exception:
-        # Fallback to pyttsx3
-        speak_pyttsx3(text, 1)
+    asyncio.run(speak_edge(text, voice))
 
 # Removed get_dynamic_notification - using random variations instead
 
@@ -190,124 +148,7 @@ def get_simple_notification(context: str, tool: str) -> str:
         ]
         return random.choice(general_variations)
 
-def get_fallback_response(context: str, tool: str) -> str:
-    """
-    Provide fallback responses when Gemini fails or returns empty
-    """
-    if context == "permission_request":
-        return f"Claude needs your confirmation for {tool}"
-    elif context == "tool_completion":
-        if tool:
-            return f"{tool} completed successfully"
-        else:
-            return "Tool operation completed"
-    elif context == "error_notification":
-        return "Claude encountered an error"
-    elif context == "completion_notification":
-        return "Task completed successfully"
-    elif context == "input_required":
-        return "Claude needs your input"
-    elif context == "status_update":
-        return "Claude status update"
-    elif context == "general_notification":
-        return "Claude notification received"
-    elif context == "waiting":
-        return "Claude is ready"
-    elif context == "session_end":
-        if tool:  # tool parameter contains session info for Stop context
-            return f"Claude session finished, {tool}"
-        else:
-            return "Claude session completed successfully"
-    elif context == "compact_notification":
-        if "automatic" in tool.lower():
-            return "Automatic compacting conversation"
-        elif "manual" in tool.lower():
-            return "Manual compacting conversation"
-        else:
-            return "Compacting conversation"
-    else:
-        return "Claude notification received"
 
-def generate_context_prompt(context: str, tool: str, result: str) -> str:
-    """
-    Generate simple, clear prompts that speak TO the user ABOUT Claude
-    """
-    if context == "permission_request":
-        return (
-            f"Say in 6 words or less that Claude needs your confirmation for {tool}. "
-            f"Speak to the user, not to Claude. Example: 'Claude needs your confirmation for {tool}' or 'Confirm {tool} permission'"
-        )
-    elif context == "tool_completion":
-        # Check if result indicates error or success
-        if any(error_word in result.lower() for error_word in ["error", "failed", "exception", "denied"]):
-            return (
-                f"Tell the user in 5 words that {tool} failed. "
-                f"Example: '{tool} failed' or 'Error in {tool}'"
-            )
-        else:
-            return (
-                f"Tell the user in 5 words that {tool} completed successfully. "
-                f"Example: '{tool} finished' or '{tool} completed successfully'"
-            )
-    elif context == "error_notification":
-        return (
-            f"Tell the user in 4 words that Claude encountered an error: {result[:30]}. "
-            f"Example: 'Claude encountered error' or 'Error occurred'"
-        )
-    elif context == "completion_notification":
-        return (
-            f"Tell the user in 4 words that a task completed: {result[:30]}. "
-            f"Example: 'Task completed successfully' or 'Operation finished'"
-        )
-    elif context == "input_required":
-        return (
-            f"Tell the user in 5 words that Claude needs their input. "
-            f"Example: 'Claude needs your input' or 'Your input required'"
-        )
-    elif context == "status_update":
-        return (
-            f"Tell the user in 4 words about Claude's status: {result[:30]}. "
-            f"Example: 'Claude status update' or 'Claude ready'"
-        )
-    elif context == "general_notification":
-        return (
-            f"Tell the user in 5 words about this notification: {result[:40]}. "
-            f"Example: 'Claude notification received' or brief summary of notification"
-        )
-    elif context == "waiting":
-        return (
-            f"Tell the user in 3 words that Claude is ready. "
-            f"Example: 'Claude ready' or 'Ready for input'"
-        )
-    elif context == "session_end":
-        if tool and result:
-            return (
-                f"Tell the user Claude session ended with comprehensive context: {tool}. "
-                f"Be smart and meaningful, under 8 words. "
-                f"Example: 'Claude finished, {tool}' or 'Session complete, {result}'"
-            )
-        elif tool:
-            return (
-                f"Tell the user Claude session ended with: {tool}. "
-                f"Be comprehensive but under 6 words. "
-                f"Example: 'Claude finished working with {tool}' or 'Session complete, used {tool}'"
-            )
-        else:
-            return (
-                f"Tell the user Claude session ended successfully. "
-                f"Be professional and brief, under 5 words. "
-                f"Example: 'Claude session completed' or 'Work finished successfully'"
-            )
-    elif context == "compact_notification":
-        return (
-            f"Tell the user that Claude is compacting the conversation. "
-            f"Type is: {tool}. Be concise, under 6 words. "
-            f"Example: 'Automatic compacting the conversation' or 'Manual compacting the conversation'"
-        )
-    else:
-        return (
-            f"Say 'Claude notification' in 2 words or less."
-        )
 
 def detect_notification_context(payload: dict, transcript_path: pathlib.Path) -> tuple[str, str, str]:
     """
@@ -506,86 +347,7 @@ def generate_tool_summary(tool: str, tool_input: dict, tool_response: any) -> st
         else:
             return f"{tool} operation completed"
 
-def list_available_voices() -> None:
-    """List all available voices on the system for user selection."""
-    print("Available voices on your system:")
-    eng = pyttsx3.init()
-    voices = eng.getProperty('voices')
-    
-    if voices:
-        for i, voice in enumerate(voices):
-            print(f"{i}: {voice.name} - {voice.id}")
-            print(f"   Languages: {getattr(voice, 'languages', 'Unknown')}")
-            print(f"   Gender: {getattr(voice, 'gender', 'Unknown')}")
-            print()
-    else:
-        print("No voices found!")
-    
-    # Test the current voice selection
-    print("Testing current voice selection...")
-    speak("Hello! This is your Claude Code voice assistant.")
 
-def test_voice_notification() -> None:
-    """Manual test mode - simulate different notification scenarios"""
-    print("Testing voice notification system...")
-    
-    # First, show available voices
-    list_available_voices()
-    
-    # Test scenarios
-    scenarios = [
-        {
-            "name": "Permission Request",
-            "context": "permission_request",
-            "tool": "Bash",
-            "result": "Requesting permission to use Bash"
-        },
-        {
-            "name": "Successful Tool Completion",
-            "context": "tool_completion", 
-            "tool": "Read",
-            "result": "File contents loaded successfully"
-        },
-        {
-            "name": "Tool Error",
-            "context": "tool_completion",
-            "tool": "Write", 
-            "result": "Error: Permission denied"
-        },
-        {
-            "name": "Waiting/Ready",
-            "context": "waiting",
-            "tool": "",
-            "result": "Claude is ready"
-        },
-        {
-            "name": "Automatic Compact",
-            "context": "compact_notification",
-            "tool": "automatic",
-            "result": "Starting automatic compacting"
-        },
-        {
-            "name": "Manual Compact",
-            "context": "compact_notification",
-            "tool": "manual",
-            "result": "Starting manual compacting"
-        }
-    ]
-    
-    for i, scenario in enumerate(scenarios, 1):
-        print(f"\n--- Test {i}: {scenario['name']} ---")
-        print(f"Context: {scenario['context']}")
-        print(f"Tool: {scenario['tool']}")
-        print(f"Result: {scenario['result']}")
-        
-        text = get_simple_notification(scenario['context'], scenario['tool'])
-        
-        print(f"Simple notification: {text}")
-        print("Speaking...")
-        speak(text or "Notification received.")
-        print("Done.")
-    
-    print("\nAll tests complete!")
 
 def process_notification(payload: dict) -> None:
     """
@@ -757,5 +519,5 @@ def process_compact_notification(payload: dict) -> None:
     speak(final_text)
 
 if __name__ == "__main__":
-    # If run directly, enter test mode
-    test_voice_notification()
+    # Test the voice system
+    speak("Hello! This is your Claude Code voice assistant.")
