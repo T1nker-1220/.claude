@@ -71,7 +71,7 @@ def speak_pyttsx3(text: str, voice_index: int = 1) -> None:
     eng.say(text)
     eng.runAndWait()
 
-def speak(text: str, voice: str = "en-GB-SoniaNeural") -> None:
+def speak(text: str, voice: str = "en-US-GuyNeural") -> None:
     """Main speak function - uses Edge TTS for better quality"""
     try:
         # Run the async Edge TTS function
