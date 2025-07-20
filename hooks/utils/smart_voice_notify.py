@@ -39,6 +39,12 @@ def speak_pyttsx3_fallback(text: str) -> None:
     try:
         import pyttsx3
         eng = pyttsx3.init()
+        voices = eng.getProperty('voices')
+        
+        # Set to female voice (Zira - index 1)
+        if voices and len(voices) > 1:
+            eng.setProperty('voice', voices[1].id)  # Zira (Female)
+        
         eng.setProperty("rate", 185)
         eng.say(text)
         eng.runAndWait()
