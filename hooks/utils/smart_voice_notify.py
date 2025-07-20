@@ -36,6 +36,7 @@ async def speak_edge(text: str, voice: str = "en-US-JennyNeural") -> None:
 def speak(text: str, voice: str = "en-GB-SoniaNeural") -> None:
     """Main speak function - uses Edge TTS with fallback"""
     try:
+        import edge_tts
         asyncio.run(speak_edge(text, voice))
     except (ImportError, ModuleNotFoundError):
         # Fallback: silent operation if edge_tts not available
