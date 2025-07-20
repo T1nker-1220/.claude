@@ -10,7 +10,7 @@ import json
 import sys
 import pathlib
 import datetime
-from utils.smart_voice_notify import speak
+from utils.smart_voice_notify import process_subagent_notification
 
 def main() -> None:
     """
@@ -26,12 +26,8 @@ def main() -> None:
     # Log the event
     log_subagent_stop(payload)
     
-    # Provide voice notification
-    task_info = payload.get("task_description", "")
-    if task_info:
-        speak(f"Subagent task completed: {task_info[:50]}")
-    else:
-        speak("Subagent task completed")
+    # Use the smart voice notification system
+    process_subagent_notification(payload)
 
 def log_subagent_stop(payload) -> None:
     """Log SubagentStop event to logs directory."""

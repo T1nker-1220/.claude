@@ -165,6 +165,39 @@ def get_simple_notification(context: str, tool: str) -> str:
             ]
             return random.choice(general_variations)
     
+    elif context == "subagent_start":
+        start_variations = [
+            "Subagent starting",
+            "Delegating to subagent",
+            "Task assigned to helper",
+            "Starting delegation",
+            "Helper agent activated",
+            "Subagent taking over"
+        ]
+        return random.choice(start_variations)
+    
+    elif context == "subagent_stop":
+        stop_variations = [
+            "Subagent finished",
+            "Helper task complete",
+            "Delegation complete",
+            "Subagent work done",
+            "Helper finished task",
+            "Delegation successful"
+        ]
+        return random.choice(stop_variations)
+    
+    elif context == "subagent_activity":
+        activity_variations = [
+            "Subagent working",
+            "Helper in progress",
+            "Delegation ongoing",
+            "Subagent active",
+            "Helper processing",
+            "Subtask executing"
+        ]
+        return random.choice(activity_variations)
+    
     else:
         general_variations = [
             "Claude notification",
@@ -184,6 +217,24 @@ def detect_notification_context(payload: dict, transcript_path: pathlib.Path) ->
     message = payload.get("message", "")
     
     # Enhanced detection patterns for various notification types
+    
+    # 0. Subagent-related patterns
+    if any(pattern in message.lower() for pattern in [
+        "subagent", "sub-agent", "delegation", "task assigned", 
+        "helper agent", "sub task", "delegating", "subtask",
+        "agent starting", "agent finished", "helper starting",
+        "helper finished", "task delegation"
+    ]):
+        if any(start_pattern in message.lower() for start_pattern in [
+            "starting", "assigned", "delegating", "activated", "beginning"
+        ]):
+            return "subagent_start", "subagent", "Subagent starting task"
+        elif any(stop_pattern in message.lower() for stop_pattern in [
+            "finished", "complete", "done", "ended", "successful"
+        ]):
+            return "subagent_stop", "subagent", "Subagent task completed"
+        else:
+            return "subagent_activity", "subagent", "Subagent activity"
     
     # 1. Permission/Confirmation requests - Multiple patterns
     if any(pattern in message.lower() for pattern in [
@@ -502,6 +553,60 @@ def process_stop_notification(payload: dict) -> None:
     final_text = text or "Claude session complete"
     speak(final_text)
 
+def process_subagent_notification(payload: dict) -> None:
+    """
+    Process SubagentStop hook events and provide voice feedback about subagent activity.
+    Uses existing utilities for consistency.
+    """
+    # Debug: Log Subagent hook information
+    import datetime
+    debug_info = {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "event": "subagent_hook_triggered",
+        "payload": payload,
+        "environment": {
+            "cwd": str(pathlib.Path.cwd()),
+            "hook_type": "SubagentStop"
+        }
+    }
+    
+    # Write debug log
+    with open("C:/Users/NATH/.claude/hooks/debug.log", "a", encoding="utf-8") as f:
+        f.write(f"{json.dumps(debug_info, indent=2)}\n")
+        f.write("="*80 + "\n")
+    
+    # Analyze subagent context from payload or transcript
+    subagent_context = "subagent_stop"  # Default for SubagentStop hook
+    subagent_info = "unknown"
+    
+    # Check if we have transcript_path to get more context
+    if "transcript_path" in payload:
+        transcript_path = pathlib.Path(payload["transcript_path"])
+        context, tool, result = detect_notification_context(payload, transcript_path)
+        if context.startswith("subagent"):
+            subagent_context = context
+            subagent_info = tool
+    
+    # Check payload message for subagent activity indicators
+    message = payload.get("message", "")
+    if message:
+        if any(start_indicator in message.lower() for start_indicator in [
+            "starting", "delegating", "assigned", "activated"
+        ]):
+            subagent_context = "subagent_start"
+        elif any(activity_indicator in message.lower() for activity_indicator in [
+            "working", "processing", "executing", "progress"
+        ]):
+            subagent_context = "subagent_activity"
+        # Default remains subagent_stop for SubagentStop hook
+    
+    # Generate subagent notification
+    text = get_simple_notification(subagent_context, "subagent")
+    
+    # Ensure we always have something to say
+    final_text = text or "Subagent notification"
+    speak(final_text)
+
 def process_compact_notification(payload: dict) -> None:
     """
     Process PreCompact hook events and provide voice feedback about compacting.
@@ -545,5 +650,20 @@ def process_compact_notification(payload: dict) -> None:
     speak(final_text)
 
 if __name__ == "__main__":
-    # Test the voice system
-    speak("Hello! This is your Claude Code voice assistant.")
+    import sys
+    
+    # Check if we're being called with a specific function
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "subagent":
+            # Handle subagent notification
+            payload = {"message": "Subagent finished task", "transcript_path": ""}
+            process_subagent_notification(payload)
+        elif sys.argv[1] == "test":
+            # Test the voice system
+            speak("Hello! This is your Claude Code voice assistant.")
+        else:
+            # Default test
+            speak("Hello! This is your Claude Code voice assistant.")
+    else:
+        # Test the voice system
+        speak("Hello! This is your Claude Code voice assistant.")
