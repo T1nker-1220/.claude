@@ -42,7 +42,7 @@
           {
             "type": "command",
             "command": "uv run C:/Users/NATH/.claude/hooks/subagent_stop.py",
-            "timeout": 10
+            "timeout": 60
           }
         ]
       }
