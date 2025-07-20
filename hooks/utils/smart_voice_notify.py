@@ -3,6 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #   "edge-tts>=6.1.0",
+#   "pyttsx3>=2.99",
 # ]
 # ///
 
@@ -33,17 +34,29 @@ async def speak_edge(text: str, voice: str = "en-US-JennyNeural") -> None:
     except:
         pass
 
+def speak_pyttsx3_fallback(text: str) -> None:
+    """Simple pyttsx3 fallback when edge_tts not available"""
+    try:
+        import pyttsx3
+        eng = pyttsx3.init()
+        eng.setProperty("rate", 185)
+        eng.say(text)
+        eng.runAndWait()
+    except:
+        # Silent fallback if pyttsx3 also fails
+        pass
+
 def speak(text: str, voice: str = "en-GB-SoniaNeural") -> None:
-    """Main speak function - uses Edge TTS with fallback"""
+    """Main speak function - uses Edge TTS with pyttsx3 fallback"""
     try:
         import edge_tts
         asyncio.run(speak_edge(text, voice))
     except (ImportError, ModuleNotFoundError):
-        # Fallback: silent operation if edge_tts not available
-        pass
+        # Fallback to pyttsx3 if edge_tts not available
+        speak_pyttsx3_fallback(text)
     except Exception:
-        # Fallback: silent operation on any other error
-        pass
+        # Fallback to pyttsx3 on any other error
+        speak_pyttsx3_fallback(text)
 
 # Removed get_dynamic_notification - using random variations instead
 
