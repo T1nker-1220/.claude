@@ -8,7 +8,7 @@
       "WebFetch(domain:*)",
       "mcp__sequentialthinking__sequentialthinking_tools"
     ],
-    "defaultMode": "plan"
+    "defaultMode": "default"
   },
   "hooks": {
     "PreToolUse": [
