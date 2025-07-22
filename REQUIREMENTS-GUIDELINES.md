@@ -93,7 +93,7 @@ Claude creates `requirements.md` in the project's `.claude/` directory with stru
 ### 5. Todo Generation (Post-Approval)
 - After requirements approval, Claude automatically uses TodoWrite
 - Creates structured, actionable todos based on requirements
-- Todos follow implementation phases: Design ’ Development ’ Testing ’ Deployment
+- Todos follow implementation phases: Design ï¿½ Development ï¿½ Testing ï¿½ Deployment
 - Each todo references specific requirements sections
 
 ### 6. File Management
