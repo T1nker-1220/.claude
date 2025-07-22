@@ -1,3 +1,0 @@
-This is a test file to verify git auto-staging functionality.
-Created to test the post_tool_use.py hook.
-Updated to test the fixed git staging functionality.
