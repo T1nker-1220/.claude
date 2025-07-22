@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.11"
-# dependencies = []
+# dependencies = ["pyautogui", "psutil", "pillow"]
 # ///
 
 import json
@@ -9,6 +9,9 @@ import sys
 import pathlib
 import subprocess
 import datetime
+import time
+import pyautogui
+import psutil
 
 def main() -> None:
     """
@@ -47,6 +50,9 @@ def main() -> None:
         
         # Auto-stage the modified file with git
         stage_file_with_git(file_path)
+        
+        # Try to trigger VS Code Copilot commit message generation
+        trigger_vscode_copilot_commit(file_path)
         
         # Only lint TypeScript files
         if file_path.suffix not in [".ts", ".tsx"]:
@@ -207,13 +213,116 @@ def find_git_root(start_path: pathlib.Path) -> pathlib.Path | None:
         current = current.parent
     return None
 
+def trigger_vscode_copilot_commit(file_path: pathlib.Path) -> None:
+    """
+    Attempts to trigger VS Code Copilot commit message generation.
+    This will only work if VS Code is running and has the source control panel open.
+    """
+    try:
+        # Check if we're in a git repository
+        git_root = find_git_root(file_path.parent)
+        if not git_root:
+            log_debug("Not in a git repository, skipping VS Code Copilot trigger")
+            return
+            
+        # Check if there are staged changes
+        if not has_staged_changes(git_root):
+            log_debug("No staged changes found, skipping VS Code Copilot trigger")
+            return
+            
+        # Check if VS Code is running
+        if not is_vscode_running():
+            log_debug("VS Code is not running, skipping Copilot trigger")
+            return
+            
+        log_debug("Attempting to trigger VS Code Copilot commit message generation")
+        
+        # Try to focus VS Code window first
+        focus_vscode_window()
+        time.sleep(0.5)
+        
+        # Open source control panel if not already open
+        open_source_control_panel()
+        time.sleep(1)
+        
+        # Click the Copilot sparkle icon (coordinates from screenshot)
+        # Note: These coordinates may need adjustment based on screen resolution/scaling
+        click_copilot_sparkle_icon()
+        
+        log_debug("Successfully triggered VS Code Copilot commit generation")
+        
+    except Exception as e:
+        log_debug(f"Error triggering VS Code Copilot: {e}")
+
+def has_staged_changes(git_root: pathlib.Path) -> bool:
+    """Check if there are any staged changes in the git repository."""
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=git_root,
+            capture_output=True,
+            timeout=5
+        )
+        # git diff --cached --quiet returns 1 if there are staged changes, 0 if none
+        return result.returncode != 0
+    except Exception:
+        return False
+
+def is_vscode_running() -> bool:
+    """Check if VS Code is currently running."""
+    try:
+        for proc in psutil.process_iter(['name']):
+            if proc.info['name'] and 'code' in proc.info['name'].lower():
+                return True
+        return False
+    except Exception:
+        return False
+
+def focus_vscode_window() -> None:
+    """Attempt to bring VS Code window to focus."""
+    try:
+        # Use Alt+Tab approach to find VS Code window
+        # This is a simple approach that may need refinement
+        windows = pyautogui.getWindowsWithTitle('Visual Studio Code')
+        if windows:
+            windows[0].activate()
+    except Exception as e:
+        log_debug(f"Could not focus VS Code window: {e}")
+
+def open_source_control_panel() -> None:
+    """Open the source control panel in VS Code using keyboard shortcut."""
+    try:
+        # Ctrl+Shift+G opens source control panel
+        pyautogui.hotkey('ctrl', 'shift', 'g')
+        log_debug("Sent Ctrl+Shift+G to open source control panel")
+    except Exception as e:
+        log_debug(f"Error opening source control panel: {e}")
+
+def click_copilot_sparkle_icon() -> None:
+    """Click the Copilot sparkle icon in the commit message input area."""
+    try:
+        # Coordinates based on the screenshot provided (may need adjustment)
+        # The sparkle icon appears to be around coordinates (228, 124)
+        # These coordinates are approximate and may need fine-tuning
+        
+        # First, try to click in the commit message input area to focus it
+        pyautogui.click(175, 124)  # Click in commit message input
+        time.sleep(0.3)
+        
+        # Then click the sparkle icon (slightly to the right)
+        pyautogui.click(228, 124)  # Click sparkle icon
+        log_debug("Clicked Copilot sparkle icon at coordinates (228, 124)")
+        
+    except Exception as e:
+        log_debug(f"Error clicking Copilot sparkle icon: {e}")
+
 def log_debug(message: str) -> None:
     """Logs a debug message to the central debug log."""
     try:
         debug_log = pathlib.Path("C:/Users/NATH/.claude/hooks/debug.log")
         timestamp = datetime.datetime.now().isoformat()
         with open(debug_log, "a", encoding="utf-8") as f:
-            f.write(f"[{timestamp}] POST_TOOL_USE_LINTER: {message}\n")
+            f.write(f"[{timestamp}] POST_TOOL_USE_COPILOT: {message}\n")
     except Exception:
         # Silently fail if logging doesn't work
         pass
