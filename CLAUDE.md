@@ -10,4 +10,4 @@ This will going to trigger if the user use the command of `/task` @REQUIREMENTS-
 - ALWAYS use sequential thinking mcp server for ever response/prompt of the user
 
 ### Auto-Commit Instructions
-- When task is complete: stage all files with `git add .`, create conventional commit message using format `type(scope): description` based on actual changes, then commit with `git commit -m "message"`.
+- When task is complete: stage all files with `git add .`, create conventional commit message using format `type(scope): description` based on actual changes, then commit with `git commit -m "message"`. Don't add any reference for claude code or any other reference, like this avoid this 🤖 Generated with Claude Code Co-Authored-By: Claude noreply@anthropic.com.
