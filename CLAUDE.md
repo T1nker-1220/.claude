@@ -10,7 +10,8 @@ This will going to trigger if the user use the command of `/task` @REQUIREMENTS-
 - ALWAYS use sequential thinking mcp server for ever response of the user
 
 ### Auto-Commit Instructions
-When asked to create git commits automatically via stop hook:
+TRIGGER=When the task is done.
+INSTRUCTIONS:
 1. Use `git add .` to stage all changes
 2. Generate conventional commit messages based on actual file changes
 3. Use format: `type(scope): description`
