@@ -6,17 +6,13 @@ This will going to trigger if the user use the command of `/task` @REQUIREMENTS-
 ### Project References
 - Puppeteer instructions located at: c:\Users\NATH\.claude\puppeter-instructions.md
 
-### .kiro/specs/ Amazon-style Specification System
-**IMPORTANT**: This project follows Amazon's spec-driven development methodology with structured specifications in .kiro/specs/ folder. Each spec contains:
-- **requirements.md**: Detailed functional requirements and specifications
-- **design.md**: Technical architecture, component design, and implementation approach
-- **tasks.md**: Task breakdown with direct references to requirements.md sections
-If there is an individual task in the selected spec folder, refer to the `requirements.md` file in that folder as mentioned in the task. Use `design.md` for overall context or when necessary.
+### Key Processing Instructions
+- ALWAYS use sequential thinking mcp server for ever response of the user
 
-### .kiro/steering Documentation
-**IMPORTANT**: This project uses .kiro/steering folder for comprehensive project documentation. Always reference the markdown files in this folder for:
-- Detailed project specifications and requirements
-- Task breakdowns and development roadmap
-- UX improvements and feature implementations
-- Technical decisions and architectural guidance
-Check .kiro/steering/*.md files before making any significant changes to understand the full context and requirements.
+### Auto-Commit Instructions
+When asked to create git commits automatically via stop hook:
+1. Use `git add .` to stage all changes
+2. Generate conventional commit messages based on actual file changes
+3. Use format: `type(scope): description`
+4. Examples: `feat(hooks): simplify auto-commit system`, `fix(api): handle null responses`
+5. Execute commit with `git commit -m "message"`
