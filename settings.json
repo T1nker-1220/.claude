@@ -10,6 +10,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "sonnet",
   "hooks": {
     "PreToolUse": [
       {
@@ -79,5 +80,7 @@
       }
     ]
   },
-  "model": "sonnet"
+  "feedbackSurveyState": {
+    "lastShownTime": 1753927341961
+  }
 }
