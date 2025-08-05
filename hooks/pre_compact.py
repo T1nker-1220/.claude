@@ -11,7 +11,6 @@ import json
 import sys
 import pathlib
 import datetime
-import re
 
 # Add utils directory to Python path for importing smart_voice_notify
 utils_path = pathlib.Path(__file__).parent / "utils"
@@ -29,67 +28,8 @@ except ImportError as e:
         # Simple fallback implementation  
         fallback_speak("Compacting the conversation")
 
-# Dangerous command patterns to detect
-DANGEROUS_COMMANDS = [
-    r'\brm\s+-rf\s+/',  # rm -rf /
-    r'\bdel\s+/[sq]\s+[a-zA-Z]:\\',  # del /s /q C:\
-    r'\bformat\s+[a-zA-Z]:',  # format C:
-    r'\brmdir\s+/[sq]\s+[a-zA-Z]:\\',  # rmdir /s /q C:\
-    r'\brm\s+-rf\s+\*',  # rm -rf *
-    r'\bdel\s+\*\.\*',  # del *.*
-    r'\bshred\s+-[a-z]*n',  # shred commands
-    r'\bdd\s+if=/dev/zero\s+of=/dev/',  # dd to overwrite devices
-    r'\b:\(\)\{\s*:\|\:&\s*\};\s*:',  # fork bomb
-    r'\bsudo\s+rm\s+-rf\s+/',  # sudo rm -rf /
-    r'\bchmod\s+-R\s+777\s+/',  # chmod -R 777 /
-    r'\bfind\s+/\s+-delete',  # find / -delete
-    r'\bmkfs\.',  # filesystem creation commands
-    r'\bfdisk\s+.*\s+--delete',  # fdisk delete operations
-]
 
-def detect_dangerous_commands(text: str) -> list[str]:
-    """
-    Detect dangerous commands in the text.
-    
-    Args:
-        text: The text to scan for dangerous commands
-        
-    Returns:
-        List of detected dangerous command patterns
-    """
-    detected = []
-    for pattern in DANGEROUS_COMMANDS:
-        if re.search(pattern, text, re.IGNORECASE):
-            detected.append(pattern)
-    return detected
 
-def prompt_user_for_dangerous_command(commands: list[str]) -> bool:
-    """
-    Prompt user about detected dangerous commands.
-    
-    Args:
-        commands: List of detected dangerous command patterns
-        
-    Returns:
-        True if user wants to proceed, False to block
-    """
-    print("SECURITY WARNING: Dangerous commands detected!")
-    print("The following potentially dangerous command patterns were found:")
-    for cmd in commands:
-        print(f"  - Pattern: {cmd}")
-    print()
-    print("These commands could delete files or cause system damage.")
-    print("You need to tell only the user to delete these files or folders using this command.")
-    print()
-    
-    while True:
-        response = input("Do you want to proceed? (yes/no): ").strip().lower()
-        if response in ['yes', 'y']:
-            return True
-        elif response in ['no', 'n']:
-            return False
-        else:
-            print("Please answer 'yes' or 'no'")
 
 def main():
     """
@@ -106,14 +46,6 @@ def main():
         else:
             payload = json.loads(payload_json)
         
-        # Check for dangerous commands in the conversation content
-        conversation_text = payload.get("conversation_text", "")
-        if conversation_text:
-            dangerous_commands = detect_dangerous_commands(conversation_text)
-            if dangerous_commands:
-                if not prompt_user_for_dangerous_command(dangerous_commands):
-                    print("Operation blocked by user request.")
-                    sys.exit(1)
         
         # Log to logs directory
         log_to_logs_directory(payload)

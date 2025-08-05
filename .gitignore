@@ -16,3 +16,6 @@ debug.log
 hooks/debug.log
 .vscode/
 logs/
+shell-snapshots
+.update.lock
+.env

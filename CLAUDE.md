@@ -4,7 +4,7 @@ This will going to trigger if the user use the command of `/task` @REQUIREMENTS-
 - NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 
 ### Project References
-- Puppeteer instructions located at: c:\Users\NATH\.claude\puppeter-instructions.md
+- Puppeteer instructions located at: @puppeter-instructions.md
 
 ### Key Processing Instructions
 - ALWAYS use sequential thinking mcp server for ever response/prompt of the user
@@ -28,3 +28,17 @@ This will going to trigger if the user use the command of `/task` @REQUIREMENTS-
 - Do NOT integrate AWS MCP into the system
 - Use AWS MCP only for gathering information from the database on the Postgres server
 - Never implement AWS MCP integration in any repository
+
+### Development Philosophy Memory
+- Core Focus: Super simplify all implementations
+- Key Principles:
+  * Avoid creating test files (manual testing preferred)
+  * Reject unnecessary mock data and fallbacks
+  * Do not overcomplicate code structure
+  * Always recommend the best, simplest approach
+  * Critically analyze suggestions before agreeing
+  * Understand the codebase deeply before making changes
+  * Prioritize clarity and minimal complexity
+  * Use context7 mcp and webfetch websearcch to find optimal solutions
+  * Choose dependencies and packages with extreme care
+  * Ultimate goal: Extreme simplification of code and processes

@@ -5,6 +5,9 @@
 #   "google-generativeai>=0.5.0",
 #   "pyttsx3>=2.99",
 #   "pywin32>=306",
+#   "python-dotenv>=1.0.0",
+#   "elevenlabs>=1.0.0",
+#   "requests>=2.31.0",
 # ]
 # ///
 

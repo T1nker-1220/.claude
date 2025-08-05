@@ -4,19 +4,25 @@
 # dependencies = [
 #   "elevenlabs>=1.0.0",
 #   "requests>=2.31.0",
+#   "python-dotenv>=1.0.0",
 # ]
 # ///
 
 import json
+import os
 import pathlib
 import random
 import tempfile
 import requests
 import subprocess
+from dotenv import load_dotenv
 
-# Hardcoded ElevenLabs API key
-ELEVENLABS_API_KEY = "sk_4c5b5d139cf16ee957812a0de9692839572dbbfb0a20770c"
-ELEVENLABS_BASE_URL = "https://api.elevenlabs.io/v1"
+# Load environment variables from .env file
+load_dotenv()
+
+# Get environment variables
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+ELEVENLABS_BASE_URL = os.getenv("ELEVENLABS_BASE_URL")
 
 def speak(text: str, voice_id: str = "cgSgspJ2msm6clMCkdW9") -> None:
     """Main speak function using ElevenLabs API"""
