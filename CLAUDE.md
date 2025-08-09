@@ -1,10 +1,5 @@
-This will going to trigger if the user use the command of `/task` @REQUIREMENTS-GUIDELINES.md
-
 ### Guidelines
 - NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
-
-### Project References
-- Puppeteer instructions located at: @puppeter-instructions.md
 
 ### Key Processing Instructions
 - ALWAYS use sequential thinking mcp server for ever response/prompt of the user
@@ -42,3 +37,11 @@ This will going to trigger if the user use the command of `/task` @REQUIREMENTS-
   * Use context7 mcp and webfetch websearcch to find optimal solutions
   * Choose dependencies and packages with extreme care
   * Ultimate goal: Extreme simplification of code and processes
+
+### Web Scraping and Data Inspection Memory
+- When searching or filtering data, use browser inspection techniques
+- For websites with complex data:
+  * Utilize browser's inspect element feature
+  * Screenshot and send results to Claude Code for verification
+  * Manually filter and validate data accuracy
+  * Recommended for businesses with dynamic website content
