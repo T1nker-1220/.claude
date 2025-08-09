@@ -103,7 +103,8 @@ def process_deletion_check(payload: Dict[str, Any]) -> Dict[str, str]:
 
 def is_dangerous_deletion(command: str) -> Tuple[bool, str]:
     """
-    Check if a bash command contains dangerous deletion patterns.
+    Check if a bash command contains any dangerous deletion commands.
+    Completely blocks ALL deletion-related commands for safety.
     
     Args:
         command: The bash command to analyze
@@ -114,111 +115,106 @@ def is_dangerous_deletion(command: str) -> Tuple[bool, str]:
     # Normalize command for analysis
     cmd_lower = command.lower().strip()
     
-    # Define dangerous deletion patterns
-    dangerous_patterns = [
-        # Unix/Linux rm patterns
-        (r'\brm\s+.*-[rf]*r[rf]*\s+[./]', "Recursive rm command detected"),
-        (r'\brm\s+.*-[rf]*f[rf]*\s+[./]', "Force rm command detected"),
-        (r'\brm\s+-rf\b', "rm -rf detected"),
-        (r'\brm\s+-fr\b', "rm -fr detected"),
-        (r'\brm\s+--recursive\b', "rm --recursive detected"),
-        (r'\brm\s+--force\b', "rm --force detected"),
-        (r'\brm\s+-r\b', "rm -r detected"),
-        (r'\brm\s+-f\b', "rm -f detected"),
+    # List of completely banned commands/keywords
+    banned_commands = [
+        # Unix/Linux deletion
+        'rm ',
+        'rm\t',
+        'rmdir',
+        'unlink',
         
-        # Glob patterns for destructive commands
-        (r'\brm\s+.*\*', "rm with glob pattern detected"),
-        (r'\brm\s+.*\?', "rm with glob pattern detected"),
-        (r'\brm\s+.*\[.*\]', "rm with glob pattern detected"),
-        (r'\brm\s+.*\{.*\}', "rm with brace expansion detected"),
-        (r'\bdel\s+.*\*', "del with glob pattern detected"),
-        (r'\bdel\s+.*\?', "del with glob pattern detected"),
-        (r'\bremove-item\s+.*\*', "Remove-Item with glob pattern detected"),
-        (r'\bremove-item\s+.*\?', "Remove-Item with glob pattern detected"),
-        (r'\brm\s+.*\.\*', "rm with dot glob pattern detected"),
-        (r'\bdel\s+.*\.\*', "del with dot glob pattern detected"),
-        (r'\bremove-item\s+.*\.\*', "Remove-Item with dot glob pattern detected"),
+        # Windows deletion
+        'del ',
+        'del\t',
+        'erase',
+        'rd ',
+        'rd\t',
         
-        # Windows CMD deletion patterns
-        (r'\brmdir\s+/s\b', "rmdir /s detected"),
-        (r'\brmdir\s+.*\s+/s\b', "rmdir with /s flag detected"),
-        (r'\brmdir\s+/q\b', "rmdir /q detected"),
-        (r'\brmdir\s+.*\s+/q\b', "rmdir with /q flag detected"),
-        (r'\bdel\s+/s\b', "del /s detected"),
-        (r'\bdel\s+.*\s+/s\b', "del with /s flag detected"),
-        (r'\bdel\s+/q\b', "del /q detected"),
-        (r'\bdel\s+.*\s+/q\b', "del with /q flag detected"),
-        (r'\bdel\s+/f\b', "del /f detected"),
-        (r'\bdel\s+.*\s+/f\b', "del with /f flag detected"),
-        (r'\berase\s+/s\b', "erase /s detected"),
-        (r'\berase\s+.*\s+/s\b', "erase with /s flag detected"),
+        # PowerShell deletion
+        'remove-item',
+        'remove-',
+        'ri ',
+        'ri\t',
         
-        # PowerShell destructive patterns
-        (r'\bremove-item\s+.*-recurse\b', "PowerShell Remove-Item -Recurse detected"),
-        (r'\bremove-item\s+.*-force\b', "PowerShell Remove-Item -Force detected"),
-        (r'\brm\s+.*-recurse\b', "PowerShell rm -Recurse detected"),
-        (r'\brm\s+.*-force\b', "PowerShell rm -Force detected"),
-        (r'\bri\s+.*-recurse\b', "PowerShell ri -Recurse detected"),
-        (r'\bri\s+.*-force\b', "PowerShell ri -Force detected"),
-        (r'\bget-childitem\s+.*\|\s*remove-item\b', "PowerShell pipeline deletion detected"),
-        (r'\bgci\s+.*\|\s*remove-item\b', "PowerShell gci pipeline deletion detected"),
-        (r'\bls\s+.*\|\s*remove-item\b', "PowerShell ls pipeline deletion detected"),
+        # Dangerous utilities
+        'shred',
+        'wipe',
+        'sdelete',
+        'format',
+        'diskpart',
+        'fdisk',
         
-        # Format and destructive system commands
-        (r'\bformat\s+[a-z]:\b', "Format drive command detected"),
-        (r'\bdiskpart\b', "Diskpart utility detected"),
-        (r'\bfsutil\s+.*delete\b', "Fsutil delete detected"),
-        (r'\bcipher\s+/w\b', "Cipher wipe command detected"),
-        (r'\bsdelete\b', "Secure delete utility detected"),
-        (r'\bshred\b', "Shred command detected"),
-        (r'\bwipe\b', "Wipe command detected"),
+        # System destruction
+        'dd if=/dev/zero',
+        'dd if=/dev/random',
+        '> /dev/sda',
+        'mkfs',
         
-        # Mass deletion patterns
-        (r'\bfind\s+.*-delete\b', "find with -delete detected"),
-        (r'\bxargs\s+.*rm\b', "xargs rm combination detected"),
-        (r'\bxargs\s+.*del\b', "xargs del combination detected"),
-        (r'\.*\*.*rm\b', "Wildcard rm pattern detected"),
-        (r'\.*\*.*del\b', "Wildcard del pattern detected"),
-        (r'\.*\*.*remove-item\b', "Wildcard Remove-Item pattern detected"),
+        # Package managers (dangerous operations)
+        'apt purge',
+        'apt-get purge',
+        'apt remove',
+        'apt-get remove',
+        'yum remove',
+        'dnf remove',
+        'pacman -R',
+        'brew uninstall',
+        'npm uninstall',
+        'pip uninstall',
         
-        # Registry destructive operations
-        (r'\breg\s+delete\b', "Registry delete command detected"),
-        (r'\bregedit\s+.*-s\b', "Silent registry edit detected"),
+        # Database destruction
+        'drop database',
+        'drop table',
+        'truncate table',
+        'delete from',
         
-        # Service and process destruction
-        (r'\btaskkill\s+/f\b', "Force task kill detected"),
-        (r'\bsc\s+delete\b', "Service delete detected"),
-        (r'\bnet\s+stop\b', "Service stop detected"),
+        # Git dangerous operations
+        'git clean -f',
+        'git reset --hard',
+        'git push --force',
         
-        # Network destructive commands
-        (r'\bnetsh\s+.*reset\b', "Network reset command detected"),
-        (r'\bipconfig\s+/flushdns\b', "DNS flush detected"),
+        # Find with delete
+        'find ',
+        'xargs',
         
-        # Boot and system destruction
-        (r'\bbcdedit\s+.*delete\b', "Boot configuration delete detected"),
-        (r'\battrib\s+.*-s\s+-h\b', "System file attribute removal detected"),
-        (r'\bbootrec\s+/fixmbr\b', "Master boot record modification detected"),
+        # Registry operations
+        'reg delete',
+        'regedit',
+        
+        # Service operations
+        'sc delete',
+        'net stop',
+        'systemctl disable',
+        'service stop',
+        
+        # Process killing
+        'kill -9',
+        'killall',
+        'taskkill',
+        'pkill',
+        
+        # Network reset
+        'netsh reset',
+        'iptables -F',
+        'ipconfig /release',
     ]
     
-    # Check against dangerous patterns - BLOCK ALL MATCHES
-    for pattern, description in dangerous_patterns:
-        if re.search(pattern, cmd_lower):
-            return True, description
+    # Check if any banned command appears in the command
+    for banned in banned_commands:
+        if banned in cmd_lower:
+            return True, f"Command contains banned operation: '{banned.strip()}'"
     
-    # Additional broad blocking for any deletion commands
-    broad_deletion_patterns = [
-        (r'\brm\s+', "rm command detected"),
-        (r'\bdel\s+', "del command detected"), 
-        (r'\berase\s+', "erase command detected"),
-        (r'\brmdir\s+', "rmdir command detected"),
-        (r'\bremove-item\s+', "PowerShell Remove-Item detected"),
-        (r'\bri\s+', "PowerShell ri (Remove-Item alias) detected"),
-    ]
-    
-    # Block these broad patterns too
-    for pattern, description in broad_deletion_patterns:
-        if re.search(pattern, cmd_lower):
-            return True, description
+    # Additional check for command chaining that might bypass simple checks
+    dangerous_operators = ['&&', '||', ';', '|', '`', '$(' ]
+    for operator in dangerous_operators:
+        if operator in command:
+            # Check each part of the chained command
+            parts = command.replace('&&', '|').replace('||', '|').replace(';', '|').split('|')
+            for part in parts:
+                part_lower = part.lower().strip()
+                for banned in banned_commands:
+                    if banned in part_lower:
+                        return True, f"Chained command contains banned operation: '{banned.strip()}'"
     
     return False, ""
 
@@ -275,7 +271,9 @@ def log_to_logs_directory(payload: Dict[str, Any]) -> None:
         payload: Hook payload containing tool information
     """
     try:
-        logs_dir = pathlib.Path("C:/Users/NATH/.claude/logs")
+        # Use dynamic path relative to hook file location
+        hook_dir = pathlib.Path(__file__).parent
+        logs_dir = hook_dir.parent / "logs"
         logs_dir.mkdir(exist_ok=True)
         
         log_file = logs_dir / "pre_tool_use.json"
@@ -310,7 +308,9 @@ def log_blocked_operation(payload: Dict[str, Any], command: str, reason: str) ->
         reason: Reason for blocking
     """
     try:
-        debug_log = pathlib.Path("C:/Users/NATH/.claude/hooks/debug.log")
+        # Use dynamic path relative to hook file location
+        hook_dir = pathlib.Path(__file__).parent
+        debug_log = hook_dir / "debug.log"
         
         timestamp = datetime.datetime.now().isoformat()
         session_id = payload.get("session_id", "unknown")
@@ -372,7 +372,9 @@ def log_debug(message: str) -> None:
         message: Debug message to log
     """
     try:
-        debug_log = pathlib.Path("C:/Users/NATH/.claude/hooks/debug.log")
+        # Use dynamic path relative to hook file location
+        hook_dir = pathlib.Path(__file__).parent
+        debug_log = hook_dir / "debug.log"
         timestamp = datetime.datetime.now().isoformat()
         
         with open(debug_log, "a", encoding="utf-8") as f:
