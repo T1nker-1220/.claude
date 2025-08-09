@@ -50,16 +50,19 @@ def main() -> None:
         # Process deletion prevention check
         result = process_deletion_check(payload)
         
-        # Output the decision as JSON
-        print(json.dumps(result))
-        
-        # Exit with appropriate code
-        sys.exit(0 if result.get("decision") == "approve" else 1)
+        # If we have a permission decision, output it
+        if result and "permissionDecision" in result:
+            print(json.dumps(result))
+            # Exit with 0 for both allow and deny (hook succeeded)
+            sys.exit(0)
+        else:
+            # No decision - let Claude's normal flow continue
+            sys.exit(0)
         
     except Exception as e:
         # Log error and allow operation (fail-open for safety)
         log_debug(f"Hook processing error: {e}")
-        print(json.dumps({"decision": "approve"}))
+        # Don't auto-approve on error - let Claude handle it normally
         sys.exit(0)
 
 def process_deletion_check(payload: Dict[str, Any]) -> Dict[str, str]:
@@ -70,19 +73,21 @@ def process_deletion_check(payload: Dict[str, Any]) -> Dict[str, str]:
         payload: JSON payload from Claude Code containing tool information
         
     Returns:
-        Dict with decision and optional reason
+        Dict with permission decision and optional reason
     """
-    # Only process Bash tool calls
+    # Only process Bash tool calls for dangerous operations
     tool_name = payload.get("tool_name", "")
     if tool_name != "Bash":
-        return {"decision": "approve"}
+        # For non-Bash tools, return empty dict to let Claude handle normally
+        return {}
     
     # Extract the bash command
     tool_input = payload.get("tool_input", {})
     command = tool_input.get("command", "")
     
     if not command:
-        return {"decision": "approve"}
+        # No command means nothing to check
+        return {}
     
     # Check for dangerous deletion patterns
     is_dangerous, reason = is_dangerous_deletion(command)
@@ -94,12 +99,14 @@ def process_deletion_check(payload: Dict[str, Any]) -> Dict[str, str]:
         # Voice notification for blocked command
         notify_blocked_command(command, reason)
         
+        # Use proper permission format per Claude Code docs
         return {
-            "decision": "block",
-            "reason": f"BLOCKED: {reason}\nCommand: {command}\n\nThis operation was blocked to prevent accidental deletion of critical files/directories."
+            "permissionDecision": "deny",
+            "permissionDecisionReason": f"BLOCKED: {reason}\nCommand: {command}\n\nThis operation was blocked to prevent accidental deletion of critical files/directories."
         }
     
-    return {"decision": "approve"}
+    # For safe Bash commands, return empty to let Claude handle normally
+    return {}
 
 def is_dangerous_deletion(command: str) -> Tuple[bool, str]:
     """

@@ -28,9 +28,6 @@ except ImportError as e:
         # Simple fallback implementation  
         fallback_speak("Compacting the conversation")
 
-
-
-
 def main():
     """
     PreCompact hook entry point.
