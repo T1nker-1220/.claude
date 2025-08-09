@@ -218,51 +218,6 @@ def is_dangerous_deletion(command: str) -> Tuple[bool, str]:
     
     return False, ""
 
-def get_protected_directories() -> List[str]:
-    """
-    Get list of directories that should be protected from deletion.
-    
-    Returns:
-        List of directory names/patterns to protect
-    """
-    return [
-        "apps/",
-        "app/",
-        "src/",
-        "source/",
-        ".git/",
-        ".github/",
-        "node_modules/",
-        "packages/",
-        "lib/",
-        "libs/",
-        "components/",
-        "pages/",
-        "public/",
-        "assets/",
-        "static/",
-        "build/",
-        "dist/",
-        "docs/",
-        ".vscode/",
-        ".idea/",
-        "config/",
-        "configs/",
-        "database/",
-        "migrations/",
-        "models/",
-        "views/",
-        "controllers/",
-        "services/",
-        "utils/",
-        "helpers/",
-        "middleware/",
-        "schemas/",
-        "types/",
-        "interfaces/",
-        "prompts/"
-    ]
-
 def log_to_logs_directory(payload: Dict[str, Any]) -> None:
     """
     Log PreToolUse event to logs directory.
