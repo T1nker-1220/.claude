@@ -126,8 +126,12 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccstatusline@latest",
+    "padding": 0
+  },
   "feedbackSurveyState": {
     "lastShownTime": 1754150831801
-  },
-  "model": "opusplan"
+  }
 }
