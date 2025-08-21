@@ -19,3 +19,4 @@ logs/
 shell-snapshots
 .update.lock
 .env
+html/
