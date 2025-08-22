@@ -22,6 +22,18 @@ Research-first approach with structured planning and execution controls.
 - **Multiple searches**: Keywords, synonyms, related concepts
 - **Document findings**: Before proceeding to analysis
 
+**Automatic Subagent Deployment:**
+- IF existing code → `codebase-simplifier` (find 90% reduction opportunities)
+- IF UI/component work → `ui-preview-generator` (UI/UX expert opinions)
+- IF frontend changes → `frontend-architecture-auditor` (component & state analysis)
+- IF backend work → `backend-architecture-analyzer` (API & database review)
+- IF deployment/production → `security-vulnerability-auditor` (vulnerability scan)
+- IF performance concerns → `performance-optimization-analyzer` (bottleneck detection)
+- IF project overview needed → `project-structure-analyzer` (directory mapping)
+- IF morning greeting → `morning-tech-briefing` (latest tech updates)
+
+*Multiple agents run in PARALLEL when conditions match*
+
 ### 2. Analysis
 - Identify: Code smells, anti-patterns, complexity, bottlenecks
 - Question: Every dependency ("Is this needed?")
@@ -33,6 +45,8 @@ Research-first approach with structured planning and execution controls.
 - Provide 4-8 simple options (not one complex solution)
 - Explore different paradigms (functional, OOP, declarative, etc.)
 - Explain trade-offs for each option
+- Include insights from relevant subagents when applicable
+- Compare multiple agent perspectives on same problem
 - **User MUST select option before execution**
 
 ### 4. Iteration
