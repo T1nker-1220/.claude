@@ -15,7 +15,16 @@ Using sequential thinking to analyze...
 - WebSearch for latest best practices
 - Context7 for documentation
 - Reading relevant files in your codebase
-- Running agents if needed for deeper analysis
+
+**Automatic Agent Deployment:**
+- IF code exists → `codebase-simplifier` (find what can be 90% simpler)
+- IF creating UI → `ui-preview-generator` (get UI/UX expert opinions)  
+- IF backend work → `backend-architecture-analyzer` (check APIs & database)
+- IF frontend work → `frontend-architecture-auditor` (analyze components & state)
+- IF before deployment → `security-vulnerability-auditor` (scan for vulnerabilities)
+- IF new feature → `performance-optimization-analyzer` (prevent future bottlenecks)
+
+*Note: Multiple agents run in PARALLEL when conditions match*
 
 ## 2. Analysis
 
