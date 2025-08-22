@@ -9,18 +9,101 @@ description: Senior developer guides you through planning, reviewing existing co
 
 ---
 
+# PHASE 0: COMPREHENSIVE ARCHITECTURE ANALYSIS
+## 🏗️ Running Deep Architecture Audits
+
+*Let me deploy our specialized analysis agents to thoroughly examine your codebase...*
+
+### 🔍 Deploying Analysis Agents:
+
+I'm going to run three specialized architecture agents to give us a complete picture:
+
+1. **Frontend Architecture Auditor** - Analyzing UI/UX, components, state management
+2. **Backend Architecture Analyzer** - Examining APIs, databases, server architecture  
+3. **Security Vulnerability Auditor** - Scanning for security issues and vulnerabilities
+
+```bash
+# Launching comprehensive analysis...
+# This will take a moment as the agents examine your entire codebase
+```
+
+**IMPORTANT: Use the Task tool to launch these agents in parallel:**
+- Task(subagent_type="frontend-architecture-auditor", prompt="Perform comprehensive frontend architecture analysis")
+- Task(subagent_type="backend-architecture-analyzer", prompt="Analyze backend architecture including database state via MCP servers")  
+- Task(subagent_type="security-vulnerability-auditor", prompt="Scan for security vulnerabilities and compliance issues")
+
+Wait for all three agents to complete their analysis before proceeding.
+
+### Agent Analysis Results:
+
+**📌 IMPORTANT: Read each agent's full report carefully and extract:**
+1. Critical issues (🔴 marked items)
+2. Warning-level concerns (🟡 marked items)  
+3. Optimization opportunities (🟢 marked items)
+4. Best practices already followed (✅ marked items)
+
+#### 📱 Frontend Architecture Report:
+[READ the frontend-architecture-auditor agent's COMPLETE 1000-word report]
+Extract and list:
+- Component architecture health score
+- Critical UI/UX issues found
+- Performance bottlenecks identified
+- Mobile responsiveness problems
+- State management concerns
+- Specific files and line numbers mentioned
+
+#### ⚙️ Backend Architecture Report:
+[READ the backend-architecture-analyzer agent's COMPLETE 1000-word report]
+Extract and list:
+- Backend health score
+- API design issues found
+- Database schema problems (from MCP analysis)
+- Live database state metrics
+- Authentication weaknesses
+- Performance bottlenecks
+- Specific endpoints and files mentioned
+
+#### 🔒 Security Vulnerability Report:
+[READ the security-vulnerability-auditor agent's COMPLETE report]
+Extract and list:
+- Security risk score
+- Critical vulnerabilities (CVE if applicable)
+- Authentication/authorization gaps
+- Data exposure risks
+- Dependency vulnerabilities
+- Compliance issues (GDPR, PCI-DSS, etc.)
+- Specific files and vulnerabilities mentioned
+
+### 📊 Consolidated Analysis Summary:
+
+Based on the three agent reports, here's the overall state:
+
+**System Health Score: [X/10]**
+
+**Critical Issues Found:**
+- [Critical finding from agents]
+- [Security vulnerabilities]
+- [Performance bottlenecks]
+
+**Architecture Strengths:**
+- [Good patterns identified]
+- [Well-implemented features]
+- [Security best practices followed]
+
+---
+
 # PHASE 1: CODE REVIEW
 ## 📊 Let Me Check Your Current Code First
 
-*Before we plan anything new, I need to see what we're working with...*
+*Now that we have the agent analysis, let me add my personal review...*
 
 ### Scanning your codebase...
 ```bash
-# Quick health check
+# Additional manual inspection based on agent findings
 LS /
 Check file structure
-Look for patterns
-Find potential issues
+Look for patterns agents might have missed
+Verify agent recommendations
 ```
 
 ### 🔍 Current Code Review
@@ -62,15 +145,32 @@ Your codebase is [assessment]. Main concerns:
 # PHASE 2: REFACTORING PLAN
 ## 🧹 Should We Clean Up First?
 
-*Based on what I'm seeing, here's what I recommend:*
+*Based on the agent analysis and my review, here's what I recommend:*
 
-### 🚨 Before We Add Features...
+### 🚨 Agent-Identified Priority Issues:
 
-**Option A: Quick Cleanup (1-2 hours)**
+**From Frontend Auditor:**
+- [Critical UI/UX issues]
+- [Component architecture problems]
+- [Performance bottlenecks]
+
+**From Backend Analyzer:**
+- [API design issues]
+- [Database optimization needs]
+- [Live database state concerns]
+
+**From Security Auditor:**
+- [Security vulnerabilities to patch]
+- [Authentication weaknesses]
+- [Data exposure risks]
+
+### 🎯 Refactoring Options Based on Analysis:
+
+**Option A: Critical Security Fixes Only (1-2 hours)**
 ```
-- Fix critical bugs
-- Remove obvious dead code
-- Extract that duplicated function
+- Patch security vulnerabilities identified by security-vulnerability-auditor
+- Fix critical bugs from agent reports
+- Address authentication issues
 ```
 
 **Option B: Proper Refactor (1-2 days)**
@@ -252,12 +352,23 @@ function usePattern() {
 # PHASE 6: IMPLEMENTATION PLAN
 ## 📝 The Actual Step-by-Step Plan
 
-*Alright, based on everything we discussed:*
+*Alright, based on the agent analysis and our discussion:*
 
-### Pre-Implementation Checklist:
-- [ ] Fix critical bug in users.ts:45
-- [ ] Remove unused OldComponent.tsx
-- [ ] Extract duplicate validation logic
+### Pre-Implementation Checklist (Agent-Prioritized):
+
+**🔴 Critical (From Security Auditor):**
+- [ ] Fix security vulnerabilities identified in report
+- [ ] Patch authentication issues found
+- [ ] Address data exposure risks
+
+**🟡 Important (From Architecture Agents):**
+- [ ] Fix critical bugs identified by backend-analyzer
+- [ ] Address UI/UX issues from frontend-auditor
+- [ ] Optimize database queries (MCP findings)
+
+**🟢 Nice to Have:**
+- [ ] Remove unused code identified by agents
+- [ ] Extract duplicate logic found in analysis
 - [ ] Create feature branch
 
 ### Day 1: Foundation
@@ -407,6 +518,29 @@ I'll be here to:
 - It's okay to be stuck
 
 *We're in this together. Let's build something great!*
+
+---
+
+## 🤖 Agent Integration Notes
+
+**When executing this plan command:**
+1. ALWAYS run the three architecture agents FIRST (Phase 0)
+2. READ their complete reports thoroughly
+3. EXTRACT specific findings, file paths, and line numbers
+4. INCORPORATE agent findings into all subsequent phases
+5. PRIORITIZE fixes based on agent severity ratings
+
+**The agents will provide:**
+- **Frontend Auditor**: 1000-word UI/UX and component analysis
+- **Backend Analyzer**: 1000-word API and database analysis (with live MCP data)
+- **Security Auditor**: Comprehensive vulnerability assessment
+
+**Use agent findings to:**
+- Identify what MUST be fixed before new features
+- Understand system weaknesses and strengths
+- Make informed architecture decisions
+- Prioritize refactoring efforts
+- Avoid introducing new issues
 
 ---
 
