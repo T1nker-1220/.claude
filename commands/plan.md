@@ -16,23 +16,50 @@ description: Senior developer guides you through planning, reviewing existing co
 
 ### 🔍 Deploying Analysis Agents:
 
-I'm going to run three specialized architecture agents to give us a complete picture:
+I'm going to run five specialized architecture agents to give us a complete picture:
 
 1. **Frontend Architecture Auditor** - Analyzing UI/UX, components, state management
 2. **Backend Architecture Analyzer** - Examining APIs, databases, server architecture  
 3. **Security Vulnerability Auditor** - Scanning for security issues and vulnerabilities
+4. **Performance Optimization Analyzer** - Identifying bottlenecks, memory leaks, and optimization opportunities
+5. **Codebase Simplifier** - Radically simplifying features to minimum code while maintaining exact functionality
 
 ```bash
 # Launching comprehensive analysis...
 # This will take a moment as the agents examine your entire codebase
 ```
 
-**IMPORTANT: Use the Task tool to launch these agents in parallel:**
-- Task(subagent_type="frontend-architecture-auditor", prompt="Perform comprehensive frontend architecture analysis")
-- Task(subagent_type="backend-architecture-analyzer", prompt="Analyze backend architecture including database state via MCP servers")  
-- Task(subagent_type="security-vulnerability-auditor", prompt="Scan for security vulnerabilities and compliance issues")
+**CRITICAL: Launch ALL 5 agents SIMULTANEOUSLY in a single parallel batch:**
 
-Wait for all three agents to complete their analysis before proceeding.
+```javascript
+// Execute ALL these Task tools in ONE message (parallel execution):
+[
+  Task(subagent_type="frontend-architecture-auditor", 
+       prompt="Perform comprehensive frontend architecture analysis and provide a detailed 1000+ word report with specific file paths, line numbers, and actionable recommendations"),
+       
+  Task(subagent_type="backend-architecture-analyzer", 
+       prompt="Analyze backend architecture including database state via MCP servers and provide a detailed 1000+ word report with API endpoints, database issues, and specific recommendations"),
+       
+  Task(subagent_type="security-vulnerability-auditor", 
+       prompt="Scan for security vulnerabilities and compliance issues, provide a comprehensive report with CVE references, risk scores, and specific vulnerable code locations"),
+       
+  Task(subagent_type="performance-optimization-analyzer", 
+       prompt="Analyze code for performance issues, memory leaks, and optimization opportunities. Provide detailed report with bottleneck locations, memory leak detections, and specific optimization recommendations"),
+       
+  Task(subagent_type="codebase-simplifier", 
+       prompt="Analyze each feature in the codebase and provide radical simplification strategies to reduce code by 50-90% while maintaining EXACT functionality. Focus on eliminating all unnecessary complexity and making code dead simple")
+]
+```
+
+**⚠️ EXECUTION REQUIREMENTS:**
+1. Launch all 5 agents AT THE SAME TIME (parallel, not sequential)
+2. Each agent MUST return a complete detailed report (minimum 500 words each)
+3. Wait for ALL agents to complete before proceeding
+4. Each agent report must include:
+   - Specific file paths and line numbers
+   - Severity ratings (🔴 Critical, 🟡 Warning, 🟢 Info)
+   - Actionable recommendations
+   - Code examples where applicable
 
 ### Agent Analysis Results:
 
@@ -74,9 +101,31 @@ Extract and list:
 - Compliance issues (GDPR, PCI-DSS, etc.)
 - Specific files and vulnerabilities mentioned
 
+#### 🚀 Performance Optimization Report:
+[READ the performance-optimization-analyzer agent's COMPLETE report]
+Extract and list:
+- Performance health score
+- Memory leak detections
+- Bottleneck locations (files and line numbers)
+- Optimization opportunities
+- Unnecessary complexity found
+- Resource usage patterns
+- Recommended optimizations
+
+#### 🚀 Codebase Simplification Report:
+[READ the codebase-simplifier agent's COMPLETE report]
+Extract and list:
+- Features analyzed and complexity scores
+- Lines of code reduction potential (current vs proposed)
+- Radical simplification opportunities (50-90% reduction)
+- Features that can be rewritten in 10x less code
+- Unnecessary abstractions to eliminate
+- Complex patterns to replace with simple code
+- Exact simplification steps for each feature
+
 ### 📊 Consolidated Analysis Summary:
 
-Based on the three agent reports, here's the overall state:
+Based on the five agent reports, here's the overall state:
 
 **System Health Score: [X/10]**
 
@@ -163,6 +212,16 @@ Your codebase is [assessment]. Main concerns:
 - [Security vulnerabilities to patch]
 - [Authentication weaknesses]
 - [Data exposure risks]
+
+**From Performance Analyzer:**
+- [Memory leaks to fix]
+- [Performance bottlenecks to optimize]
+- [Resource usage improvements]
+
+**From Codebase Simplifier:**
+- [Features that can be 90% smaller]
+- [Complex code to make dead simple]
+- [Unnecessary abstractions to delete]
 
 ### 🎯 Refactoring Options Based on Analysis:
 
@@ -524,16 +583,31 @@ I'll be here to:
 ## 🤖 Agent Integration Notes
 
 **When executing this plan command:**
-1. ALWAYS run the three architecture agents FIRST (Phase 0)
-2. READ their complete reports thoroughly
-3. EXTRACT specific findings, file paths, and line numbers
-4. INCORPORATE agent findings into all subsequent phases
-5. PRIORITIZE fixes based on agent severity ratings
+1. ALWAYS run ALL FIVE agents SIMULTANEOUSLY in Phase 0 (parallel execution)
+2. WAIT for ALL agents to complete and return their reports
+3. READ each agent's complete report thoroughly (each should be 500+ words)
+4. EXTRACT specific findings, file paths, and line numbers from EACH report
+5. INCORPORATE findings from ALL agents into subsequent phases
+6. PRIORITIZE fixes based on agent severity ratings
 
-**The agents will provide:**
-- **Frontend Auditor**: 1000-word UI/UX and component analysis
-- **Backend Analyzer**: 1000-word API and database analysis (with live MCP data)
-- **Security Auditor**: Comprehensive vulnerability assessment
+**PARALLEL EXECUTION REQUIREMENT:**
+- All 5 agents MUST be launched in a SINGLE message with multiple Task tool calls
+- This ensures they run CONCURRENTLY, not sequentially
+- Do NOT launch agents one by one - they must run AT THE SAME TIME
+
+**Each agent WILL provide a complete report:**
+- **Frontend Auditor**: 1000+ word UI/UX and component analysis report
+- **Backend Analyzer**: 1000+ word API and database analysis report (with live MCP data)
+- **Security Auditor**: Comprehensive vulnerability assessment report with CVEs
+- **Performance Analyzer**: Detailed performance analysis report with bottlenecks
+- **Codebase Simplifier**: Radical simplification report showing 50-90% code reduction strategies
+
+**Report Requirements for Each Agent:**
+- Minimum 500 words per report
+- Specific file paths and line numbers
+- Severity ratings (Critical/Warning/Info)
+- Actionable recommendations
+- Code examples where applicable
 
 **Use agent findings to:**
 - Identify what MUST be fixed before new features
