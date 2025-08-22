@@ -172,3 +172,4 @@ if (optimization_considered):
 ---
 
 # END OF CRITICAL CONFIGURATION
+- never run pnpm dev
