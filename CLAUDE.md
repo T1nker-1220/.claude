@@ -14,7 +14,7 @@
 
 ## Auto-Commit Protocol (trigger this after every implementation task completion)
 
-- when staging: just do git add .
+- when staging: just do git add . + git commit
 - format should be: type(scope): description
 - things to avoid:
   - no Claude Code references in commits
