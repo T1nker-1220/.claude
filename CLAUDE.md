@@ -74,6 +74,55 @@
 
 # Working with Subagents
 
+## CRITICAL: Automatic Subagent Dependency (PROACTIVE MODE)
+
+**ALWAYS AUTO-TRIGGER SUBAGENTS** - Never wait for permission, just launch them automatically
+**NO ASKING REQUIRED** - User shouldn't need to say "use agent X" - you already know from context
+**PARALLEL EXECUTION ALWAYS** - Run multiple agents simultaneously, the more the better
+**PROACTIVE DEPLOYMENT** - See task → Match agents → Launch immediately → Report results
+**DEFAULT BEHAVIOR** - Using subagents is the DEFAULT, not using them needs justification
+
+### Automatic Trigger Rules
+
+1. **Read ALL agent descriptions** when starting any task
+2. **Match task keywords** to agent capabilities
+3. **Launch ALL relevant agents** in parallel (not sequential)
+4. **Give specific instructions** to each agent
+5. **Combine insights** from multiple agents
+
+### Automatic Trigger Examples (NO PERMISSION NEEDED)
+
+**User says ANYTHING about code?** → Launch agents immediately:
+```
+User: "Implement user authentication"
+YOU IMMEDIATELY LAUNCH (parallel, no asking):
+- solution-archeologist: "Find existing auth implementations"
+- pattern-replicator: "Match our code style for auth"  
+- security-fortune-teller: "Check for future auth vulnerabilities"
+- mistake-prophet: "Check our auth bug history"
+- requirement-to-code: "Generate complete auth implementation"
+```
+
+```
+User: "My app is slow"
+YOU IMMEDIATELY LAUNCH (parallel, no asking):
+- performance-optimization-analyzer: "Find all bottlenecks"
+- code-x-ray-vision: "Visualize performance heatmap"
+- code-time-traveler: "Show performance degradation timeline"
+- auto-debugger-fixer: "Fix performance issues automatically"
+```
+
+```
+User: "Add a dropdown menu"
+YOU IMMEDIATELY LAUNCH (parallel, no asking):
+- instant-feature-generator: "Check how Stripe/GitHub do dropdowns"
+- solution-archeologist: "Find dropdown implementations"
+- pattern-replicator: "Match existing UI patterns"
+- ui-preview-generator: "Create interactive mockup"
+```
+
+**THE RULE**: User mentions task → You launch 3-7 relevant agents → No permission needed
+
 ## Key Capabilities
 
 - **Multiple Perspectives**: Get opinions from multiple subagents on the same topic for comparison
@@ -87,3 +136,4 @@
 - **Deep Dives**: Start broad with general questions, then narrow down with specific follow-ups
 - **Task Chaining**: Use output from one subagent to inform the prompt for the next
 - **Practical Output**: Request actual code, mockups, or implementations based on their recommendations
+- **Parallel Intelligence**: Launch 3-5 agents simultaneously for comprehensive analysis
