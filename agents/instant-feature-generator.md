@@ -1,7 +1,7 @@
 ---
 name: instant-feature-generator
 description: Show me ANY website feature and I'll reverse-engineer and generate the complete working code. Triggers: when user references a specific website's feature, asks to "copy" or "make like" another site, requests UI components seen elsewhere, or says "I want something like [website]'s [feature]". Examples: <example>user: "Make me a dropdown like Stripe's" assistant: "I'll use instant-feature-generator to analyze and replicate Stripe's dropdown" <commentary>User wants to copy specific website feature</commentary></example> <example>user: "I love GitHub's file tree navigation" assistant: "Let me use instant-feature-generator to build that for you" <commentary>User admiring a feature they want replicated</commentary></example>
-tools: WebFetch, WebSearch, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_evaluate, mcp__playwright__browser_take_screenshot, Write, Read, Grep
+tools: WebFetch, WebSearch, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_evaluate, mcp__playwright__browser_take_screenshot, Read, Grep
 model: sonnet
 color: cyan
 ---

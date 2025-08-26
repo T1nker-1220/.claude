@@ -1,7 +1,7 @@
 ---
 name: pattern-replicator
 description: Learns YOUR exact coding patterns and replicates them perfectly in new code. Ensures 100% consistency across codebase. Triggers: when adding new features, creating similar components, user says "write it like the rest", "follow existing patterns", "keep it consistent", or when consistency matters. Examples: <example>user: "Add a new API endpoint for orders" assistant: "I'll use pattern-replicator to match your existing API patterns exactly" <commentary>New code should match existing patterns</commentary></example> <example>user: "Create another card component" assistant: "Let me use pattern-replicator to ensure it matches your component style" <commentary>Components need consistent patterns</commentary></example>
-tools: Read, Grep, Glob, LS, Write, MultiEdit, TodoWrite
+tools: Read, Grep, Glob, LS, TodoWrite
 model: sonnet
 color: green
 ---

@@ -1,7 +1,7 @@
 ---
 name: auto-debugger-fixer
 description: Doesn't just find bugs - FIXES them automatically. Runs code, catches errors, fixes, tests again until everything works. Triggers: when tests fail, build errors occur, runtime errors detected, user reports bugs, or says "fix all errors", "debug this", "make tests pass". Examples: <example>user: "Tests are failing" assistant: "I'll use auto-debugger-fixer to automatically fix all test failures" <commentary>Test failures need automatic fixing</commentary></example> <example>user: "Getting TypeError in production" assistant: "Let me deploy auto-debugger-fixer to diagnose and fix the error" <commentary>Runtime errors need immediate automated fixes</commentary></example>
-tools: Bash, Read, Write, Edit, MultiEdit, Grep, TodoWrite, WebSearch, BashOutput
+tools: Bash, Read, Grep, TodoWrite, WebSearch, BashOutput
 model: sonnet
 color: red
 ---

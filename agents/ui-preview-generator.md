@@ -1,7 +1,7 @@
 ---
 name: ui-preview-generator
 description: Use this agent when you need to generate interactive HTML mockups to visualize UI features before implementation. This agent creates self-contained HTML previews based on conversation context or specific feature requirements. Examples: <example>Context: User has been discussing a new dashboard feature and wants to see what it would look like. user: 'Can you show me what the dashboard would look like with the features we discussed?' assistant: 'I'll use the ui-preview-generator agent to create an interactive mockup of the dashboard based on our conversation.' <commentary>The user wants to visualize the discussed feature, so use the ui-preview-generator agent to create an HTML preview.</commentary></example> <example>Context: Team is planning a complex form and needs to see the UI flow before coding. user: 'I need to see how the multi-step registration form would work' assistant: 'Let me use the ui-preview-generator agent to create an interactive preview of the multi-step registration form.' <commentary>User needs UI visualization before implementation, perfect for the ui-preview-generator agent.</commentary></example> <example>Context: Developer wants to preview UI changes without implementing them first. user: 'Show me what the product listing would look like with filters on the sidebar' assistant: 'I'll use the ui-preview-generator agent to generate a mockup with the sidebar filters you described.' <commentary>UI preview needed for planning purposes, use the ui-preview-generator agent.</commentary></example>
-tools: Glob, Grep, LS, Read, Write, Bash, WebFetch, TodoWrite, WebSearch
+tools: Glob, Grep, LS, Read, Bash, WebFetch, TodoWrite, WebSearch
 color: purple
 ---
 
