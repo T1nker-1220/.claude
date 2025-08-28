@@ -2,76 +2,72 @@
 # /// script
 # requires-python = ">=3.9"
 # dependencies = [
-#   "realtimetts[system,edge]>=0.5.0",
+#   "pyttsx3>=2.90",
 # ]
 # ///
 
-"""Simplified voice notifications using RealtimeTTS Framework
-Replaces 222-line ElevenLabs implementation with 78-line local solution.
+"""Simplified voice notifications using Windows SAPI
+Replaces 222-line ElevenLabs implementation with ultra-simple local solution.
 Maintains full hook compatibility while eliminating external dependencies.
 """
 
 import json
 import pathlib
-import random
-from typing import Optional, Tuple
+import threading
+from typing import Tuple
 
-# Global audio stream - initialize once, reuse for performance
-_audio_stream = None
-_engine_initialized = False
+# Global TTS engine - initialize once, reuse for performance
+_tts_engine = None
+_engine_lock = threading.Lock()
 
-def _initialize_audio_stream():
-    """Initialize RealtimeTTS with 3-tier engine fallback"""
-    global _audio_stream, _engine_initialized
+def _get_tts_engine():
+    """Get or initialize Windows SAPI TTS engine"""
+    global _tts_engine
     
-    if _engine_initialized:
-        return _audio_stream
-        
-    try:
-        from RealtimeTTS import TextToAudioStream
-        
-        # Try engines in order: System (fastest) -> Edge (backup)
-        engines = []
-        
-        # Tier 1: System TTS (Windows SAPI, always available)
-        try:
-            from RealtimeTTS import SystemEngine
-            engines.append(SystemEngine())
-        except ImportError:
-            pass
-        
-        # Tier 2: Edge TTS (cloud fallback, high quality)
-        try:
-            from RealtimeTTS import EdgeEngine
-            engines.append(EdgeEngine())
-        except ImportError:
-            pass
-        
-        if engines:
-            _audio_stream = TextToAudioStream(
-                engines[0], 
-                fallback_engines=engines[1:] if len(engines) > 1 else []
-            )
-            _engine_initialized = True
-            return _audio_stream
-            
-    except Exception:
-        pass
+    if _tts_engine is None:
+        with _engine_lock:
+            if _tts_engine is None:
+                try:
+                    import pyttsx3
+                    _tts_engine = pyttsx3.init('sapi5')  # Windows SAPI
+                    
+                    # Configure for fast, clear speech
+                    voices = _tts_engine.getProperty('voices')
+                    if voices:
+                        # Use first available voice (usually default system voice)
+                        _tts_engine.setProperty('voice', voices[0].id)
+                    
+                    # Set speech rate (words per minute) - faster for notifications
+                    _tts_engine.setProperty('rate', 180)
+                    
+                    # Set volume (0.0 to 1.0)
+                    _tts_engine.setProperty('volume', 0.8)
+                    
+                except Exception:
+                    _tts_engine = None
     
-    return None
+    return _tts_engine
 
 def speak(text: str, voice_id: str = None) -> None:
-    """Main speak function - reduced from 35 lines to 8 lines"""
+    """Main speak function - ultra-simplified Windows SAPI"""
     try:
-        stream = _initialize_audio_stream()
-        if stream:
-            stream.feed(text)
-            stream.play_async(fast_sentence_fragment=True, buffer_threshold_seconds=0.1)
+        engine = _get_tts_engine()
+        if engine:
+            # Run TTS in separate thread to avoid blocking
+            def _speak_async():
+                try:
+                    engine.say(text)
+                    engine.runAndWait()
+                except Exception:
+                    pass
+            
+            thread = threading.Thread(target=_speak_async, daemon=True)
+            thread.start()
     except Exception:
         pass  # Silent fail maintains compatibility
 
 def detect_context(payload: dict) -> Tuple[str, str]:
-    """Simplified context detection - reduced from 46 lines to 12 lines"""
+    """Simplified context detection"""
     message = payload.get("message", "").lower()
     
     if "subagent" in message:
@@ -86,7 +82,7 @@ def detect_context(payload: dict) -> Tuple[str, str]:
         return "ready", ""
 
 def get_notification_text(context: str, tool: str = "") -> str:
-    """Generate notification text - reduced from 40 lines to 8 lines"""
+    """Generate notification text"""
     messages = {
         "permission": f"Permission for {tool}" if tool else "Permission needed",
         "ready": "Claude ready",
@@ -128,15 +124,15 @@ def process_notification(payload: dict) -> None:
     speak(text)
 
 def process_stop_notification(payload: dict) -> None:
-    """Session end notification - simplified"""
+    """Session end notification"""
     speak("Session complete")
 
 def process_subagent_notification(payload: dict) -> None:
-    """Subagent notification - simplified"""  
+    """Subagent notification"""  
     speak("Helper finished")
 
 def process_compact_notification(payload: dict) -> None:
-    """Compact notification - simplified"""
+    """Compact notification"""
     speak("Compacting chat")
 
 # Test and diagnostic functionality
@@ -151,14 +147,14 @@ if __name__ == "__main__":
             
         elif test_type == "engines":
             try:
-                stream = _initialize_audio_stream()
-                if stream:
-                    speak("All engines initialized successfully")
-                    print("SUCCESS: RealtimeTTS engines available")
+                engine = _get_tts_engine()
+                if engine:
+                    speak("Windows speech engine working")
+                    print("SUCCESS: Windows SAPI TTS available")
                 else:
-                    print("ERROR: Engine initialization failed")
+                    print("ERROR: TTS engine initialization failed")
             except Exception as e:
-                print(f"ERROR: Engine initialization failed: {e}")
+                print(f"ERROR: TTS engine failed: {e}")
                 
         else:
             speak("Hello! This is your simplified Claude Code voice assistant.")

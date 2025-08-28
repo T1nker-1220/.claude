@@ -1,7 +1,9 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.11"
-# dependencies = []
+# dependencies = [
+#   "pyttsx3>=2.90",
+# ]
 # ///
 
 import json
@@ -9,6 +11,16 @@ import sys
 import pathlib
 import subprocess
 import datetime
+
+# Add utils directory to Python path for importing smart_voice_notify
+sys.path.insert(0, str(pathlib.Path(__file__).parent / "utils"))
+
+try:
+    from smart_voice_notify import speak
+except ImportError:
+    def speak(text: str) -> None:
+        """Fallback if voice notification not available"""
+        pass
 
 def main() -> None:
     """
@@ -68,6 +80,7 @@ def main() -> None:
 
         if quality_issues:
             log_debug(f"Quality issues found. Providing feedback.")
+            speak("Code quality issues found")
             decision = {
                 "decision": "block",
                 "reason": (
@@ -76,6 +89,10 @@ def main() -> None:
                     "Please address these issues for better code quality."
                 )
             }
+        else:
+            # Only speak for successful checks that actually ran on TS/JS files
+            if file_path.suffix in [".ts", ".tsx", ".js", ".jsx"]:
+                speak("Code quality check passed")
 
         # Log everything to structured logs
         log_to_structured_logs(payload, quality_result)
@@ -167,6 +184,7 @@ def run_prettier_format(file_path: pathlib.Path, project_root: pathlib.Path) -> 
         
         if format_result.returncode == 0:
             log_debug("Prettier: File formatted successfully")
+            speak("Prettier formatting applied")
             return "✅ File has been auto-formatted with Prettier"
         else:
             return f"❌ Prettier formatting failed: {format_result.stderr}"
@@ -200,6 +218,7 @@ def run_eslint_autofix(file_path: pathlib.Path, project_root: pathlib.Path) -> s
                 return error_report
         
         log_debug("ESLint: Auto-fixed successfully")
+        speak("ESLint fixes applied")
         return "✅ ESLint auto-fixes applied"
         
     except Exception as e:
@@ -261,6 +280,7 @@ def stage_file_with_git(file_path: pathlib.Path) -> None:
         
         if result.returncode == 0:
             log_debug(f"Successfully staged file: {file_path}")
+            speak(f"File staged: {file_path.name}")
         else:
             log_debug(f"Git staging failed for {file_path}: {result.stderr.strip()}")
             

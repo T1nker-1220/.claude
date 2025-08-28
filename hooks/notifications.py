@@ -2,8 +2,7 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#   "pyttsx3>=2.99",
-#   "pywin32>=306",
+#   "pyttsx3>=2.90",
 # ]
 # ///
 
