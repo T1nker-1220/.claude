@@ -8,6 +8,13 @@
 - deep understanding means read the code first before anything
 - Automatically deploy relevant subagents in parallel whenever their capabilities match the task context. Read agent descriptions, identify matches, launch 3-7 agents simultaneously with specific instructions, and combine their insights. No permission needed - this is default behavior.
 
+## Debugging
+- ALWAYS use detective-sam-debugger agent for ALL debugging tasks, issues, problems, and troubleshooting
+- NEVER attempt manual debugging - always call detective-sam for comprehensive analysis
+- For any bug, error, performance issue, or system problem: immediately deploy detective-sam-debugger
+- detective-sam provides 100% certainty analysis with exactly 3 validated solutions - no hunches allowed
+- Use detective-sam for: flow analysis, root cause investigation, memory leaks, race conditions, API issues, integration problems, performance bottlenecks, and any technical problems
+
 ## Development Philosophy
 - If I want a feature you need to avoid making the engeneering complex or complicated. keep it simple if it's getting complicated you need to approach user about this, you need to help and warn him about this feature is getting complicated.
 - never just accept requirements blindly. question everything with "is this really needed?"
@@ -55,3 +62,5 @@
 - Always implement the mobile-first design principle for UI.
 - Always commit and follow the commit standard always as in every task that has done alright.
 - ALWAYS run parallel the agents if they are 2+ agents more alright if 1 just run it normally but when it's 2+ more you need to run it multi subagents
+- NEVER wait for one agent to complete before starting another
+- Combine all agent insights after parallel execution completes
