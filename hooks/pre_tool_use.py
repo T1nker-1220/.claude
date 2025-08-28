@@ -48,9 +48,6 @@ def main() -> None:
         # Log all tool usage to logs directory
         log_to_logs_directory(payload)
         
-        # GitButler pre-tool integration
-        run_gitbutler_pre_tool(payload)
-        
         # Process security and deletion prevention check
         result = process_deletion_check(payload)
         
@@ -376,45 +373,6 @@ def notify_blocked_command(command: str, reason: str) -> None:
         # Don't fail the hook if voice notification fails
         log_debug(f"Voice notification failed: {e}")
 
-def run_gitbutler_pre_tool(payload: Dict[str, Any]) -> None:
-    """
-    GitButler integration - runs before tool execution.
-    Only runs for file modification tools (Write, Edit, MultiEdit).
-    
-    Args:
-        payload: Hook payload containing tool information
-    """
-    try:
-        tool_name = payload.get("tool_name", "")
-        
-        # Only run for file modification tools
-        if tool_name not in ["Edit", "MultiEdit", "Write"]:
-            log_debug(f"GitButler: Skipping tool '{tool_name}' - not a file modification tool")
-            return
-        
-        log_debug(f"GitButler: Processing '{tool_name}' tool - running pre-tool command")
-            
-        # Check if GitButler is available
-        import subprocess
-        gitbutler_path = r"C:\Program Files\GitButler\but.exe"
-        result = subprocess.run(
-            [gitbutler_path, "claude", "pre-tool"], 
-            capture_output=True, 
-            text=True, 
-            timeout=10
-        )
-        
-        if result.returncode == 0:
-            log_debug("GitButler pre-tool command executed successfully")
-        else:
-            log_debug(f"GitButler pre-tool failed: {result.stderr}")
-            
-    except subprocess.TimeoutExpired:
-        log_debug("GitButler pre-tool command timed out")
-    except FileNotFoundError:
-        log_debug("GitButler CLI not found - skipping GitButler integration")
-    except Exception as e:
-        log_debug(f"GitButler pre-tool error: {e}")
 
 def log_debug(message: str) -> None:
     """

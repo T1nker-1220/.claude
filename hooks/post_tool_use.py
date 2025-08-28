@@ -23,23 +23,27 @@ def main() -> None:
 
     # Default decision is to let the workflow continue
     decision = {"decision": "approve"}
+    quality_result = ""
     
     try:
         # This hook should only act on successful file modifications
         tool_name = payload.get("tool_name")
         if tool_name not in ["Write", "Edit", "MultiEdit"]:
+            log_to_structured_logs(payload, quality_result)
             print(json.dumps(decision))
             return
 
         tool_response = payload.get("tool_response", {})
         if not tool_response.get("success", False) and "filePath" not in tool_response:
-             print(json.dumps(decision))
-             return
+            log_to_structured_logs(payload, "Tool operation failed")
+            print(json.dumps(decision))
+            return
              
         # Extract the file path that was modified
         file_path_str = get_file_path(payload)
         if not file_path_str:
             log_debug(f"Could not determine file path from payload for tool {tool_name}")
+            log_to_structured_logs(payload, "Could not determine file path")
             print(json.dumps(decision))
             return
 
@@ -48,13 +52,11 @@ def main() -> None:
         # Auto-stage the modified file with git
         stage_file_with_git(file_path)
         
-        # GitButler post-tool integration (for ALL file modifications)
-        log_debug(f"GitButler: Running post-tool command for file: {file_path}")
-        run_gitbutler_post_tool()
-        
         # Enhanced TypeScript/JavaScript file processing
         if file_path.suffix not in [".ts", ".tsx", ".js", ".jsx"]:
             log_debug(f"File modified: {file_path}. Skipping TypeScript quality checks.")
+            quality_result = "Skipped - not a TypeScript/JavaScript file"
+            log_to_structured_logs(payload, quality_result)
             print(json.dumps(decision))
             return
 
@@ -62,6 +64,7 @@ def main() -> None:
 
         # Run comprehensive TypeScript quality checks
         quality_issues = run_typescript_quality_checks(file_path)
+        quality_result = quality_issues if quality_issues else "No issues found"
 
         if quality_issues:
             log_debug(f"Quality issues found. Providing feedback.")
@@ -74,8 +77,13 @@ def main() -> None:
                 )
             }
 
+        # Log everything to structured logs
+        log_to_structured_logs(payload, quality_result)
+
     except Exception as e:
         log_debug(f"Error in post_tool_use.py linter hook: {e}")
+        quality_result = f"Error: {str(e)}"
+        log_to_structured_logs(payload, quality_result)
         # In case of any error in the hook itself, always approve to not break the user's flow
         decision = {"decision": "approve"}
 
@@ -230,28 +238,6 @@ def run_typescript_check(file_path: pathlib.Path, project_root: pathlib.Path) ->
         log_debug(f"TypeScript check error: {e}")
         return f"❌ TypeScript check error: {str(e)}"
 
-def run_gitbutler_post_tool() -> None:
-    """GitButler integration - runs after tool execution."""
-    try:
-        gitbutler_path = r"C:\Program Files\GitButler\but.exe"
-        result = subprocess.run(
-            [gitbutler_path, "claude", "post-tool"], 
-            capture_output=True, 
-            text=True, 
-            timeout=10
-        )
-        
-        if result.returncode == 0:
-            log_debug("GitButler post-tool command executed successfully")
-        else:
-            log_debug(f"GitButler post-tool failed: {result.stderr}")
-            
-    except subprocess.TimeoutExpired:
-        log_debug("GitButler post-tool command timed out")
-    except FileNotFoundError:
-        log_debug("GitButler CLI not found - skipping GitButler integration")
-    except Exception as e:
-        log_debug(f"GitButler post-tool error: {e}")
 
 
 def format_error_report(lint_output: list) -> str:
@@ -332,13 +318,12 @@ def log_debug(message: str) -> None:
         # Silently fail if logging doesn't work
         pass
 
-def log_to_structured_logs(payload: dict, gitbutler_result: dict = None, quality_result: str = "") -> None:
+def log_to_structured_logs(payload: dict, quality_result: str = "") -> None:
     """
     Log PostToolUse event to structured logs directory.
     
     Args:
         payload: Hook payload containing tool information
-        gitbutler_result: GitButler command result
         quality_result: TypeScript quality check results
     """
     try:
@@ -359,7 +344,6 @@ def log_to_structured_logs(payload: dict, gitbutler_result: dict = None, quality
             "cwd": payload.get("cwd", "unknown"),
             "transcript_path": payload.get("transcript_path", "unknown"),
             "hook_event_name": payload.get("hook_event_name", "PostToolUse"),
-            "gitbutler_result": gitbutler_result,
             "quality_result": quality_result if quality_result else None
         }
         
