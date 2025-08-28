@@ -128,11 +128,7 @@ def run_typescript_quality_checks(file_path: pathlib.Path) -> str:
         if eslint_issues:
             quality_report.append(f"🔍 **ESLint Issues:**\n{eslint_issues}")
         
-        # 3. Run TypeScript compilation check (for .ts/.tsx files)
-        if file_path.suffix in [".ts", ".tsx"]:
-            tsc_issues = run_typescript_check(file_path, project_root)
-            if tsc_issues:
-                quality_report.append(f"⚡ **TypeScript Compilation:**\n{tsc_issues}")
+        # TypeScript compilation check removed due to module resolution issues
         
         return "\n\n".join(quality_report)
         
@@ -210,33 +206,6 @@ def run_eslint_autofix(file_path: pathlib.Path, project_root: pathlib.Path) -> s
         log_debug(f"ESLint error: {e}")
         return f"❌ ESLint error: {str(e)}"
 
-def run_typescript_check(file_path: pathlib.Path, project_root: pathlib.Path) -> str:
-    """Run TypeScript compilation check."""
-    try:
-        tsc_cmd = ["npx", "tsc", "--noEmit", "--skipLibCheck", str(file_path)]
-        result = subprocess.run(
-            tsc_cmd,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-            timeout=30,
-            shell=True
-        )
-        
-        if result.returncode == 0:
-            log_debug("TypeScript: Compilation successful")
-            return ""
-        
-        # Format TypeScript errors
-        errors = result.stdout.strip() if result.stdout.strip() else result.stderr.strip()
-        if errors:
-            return f"❌ TypeScript compilation errors:\n```\n{errors}\n```"
-            
-        return ""
-        
-    except Exception as e:
-        log_debug(f"TypeScript check error: {e}")
-        return f"❌ TypeScript check error: {str(e)}"
 
 
 
