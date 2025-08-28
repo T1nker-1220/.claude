@@ -15,6 +15,7 @@ import json
 import sys
 import pathlib
 import datetime
+import subprocess
 from utils.smart_voice_notify import process_stop_notification
 
 def main() -> None:
@@ -34,6 +35,8 @@ def main() -> None:
     # Log to logs directory
     log_to_logs_directory(payload)
     
+    # GitButler stop integration - create commits and branches
+    run_gitbutler_stop(payload)
     
     # Process using utility functions
     process_stop_notification(payload)
@@ -71,6 +74,48 @@ def log_to_logs_directory(payload) -> None:
     except Exception as e:
         # Don't fail the hook if logging fails
         print(f"Failed to log to logs directory: {e}", file=sys.stderr)
+
+def run_gitbutler_stop(payload) -> None:
+    """
+    GitButler integration - runs when Claude Code session stops.
+    Creates commits and manages branches automatically.
+    
+    Args:
+        payload: Hook payload containing session information
+    """
+    try:
+        # Run GitButler stop command to create commits and branches
+        result = subprocess.run(
+            ["but", "claude", "stop"], 
+            capture_output=True, 
+            text=True, 
+            timeout=30  # Longer timeout for git operations
+        )
+        
+        if result.returncode == 0:
+            log_debug("GitButler stop command executed successfully - commits and branches created")
+            if result.stdout.strip():
+                log_debug(f"GitButler output: {result.stdout}")
+        else:
+            log_debug(f"GitButler stop failed: {result.stderr}")
+            
+    except subprocess.TimeoutExpired:
+        log_debug("GitButler stop command timed out")
+    except FileNotFoundError:
+        log_debug("GitButler CLI not found - skipping GitButler integration")
+    except Exception as e:
+        log_debug(f"GitButler stop error: {e}")
+
+def log_debug(message: str) -> None:
+    """Log debug message to debug.log file."""
+    try:
+        debug_log = pathlib.Path("C:/Users/NATH/.claude/hooks/debug.log")
+        timestamp = datetime.datetime.now().isoformat()
+        with open(debug_log, "a", encoding="utf-8") as f:
+            f.write(f"[{timestamp}] STOP: {message}\n")
+    except Exception:
+        # Silently fail if logging doesn't work
+        pass
 
 if __name__ == "__main__":
     main()

@@ -20,3 +20,4 @@ shell-snapshots
 .update.lock
 .env
 html/
+save.md

@@ -29,9 +29,10 @@ except ImportError:
 
 def main() -> None:
     """
-    PreToolUse hook handler - Deletion prevention system and tool logging.
-    Blocks dangerous deletion operations targeting critical directories.
-    Logs all tool usage for audit trail.
+    PreToolUse hook handler with enhanced security and GitButler integration.
+    - Blocks dangerous deletion operations and security violations
+    - Integrates with GitButler for automatic branch management
+    - Logs all tool usage for audit trail
     """
     try:
         # Read JSON payload from stdin
@@ -47,7 +48,10 @@ def main() -> None:
         # Log all tool usage to logs directory
         log_to_logs_directory(payload)
         
-        # Process deletion prevention check
+        # GitButler pre-tool integration
+        run_gitbutler_pre_tool(payload)
+        
+        # Process security and deletion prevention check
         result = process_deletion_check(payload)
         
         # If we have a permission decision, output it
@@ -110,8 +114,8 @@ def process_deletion_check(payload: Dict[str, Any]) -> Dict[str, str]:
 
 def is_dangerous_deletion(command: str) -> Tuple[bool, str]:
     """
-    Check if a bash command contains any dangerous deletion commands.
-    Completely blocks ALL deletion-related commands for safety.
+    Enhanced security check for dangerous commands (beyond just deletion).
+    Blocks dangerous rm commands, security violations, and malicious operations.
     
     Args:
         command: The bash command to analyze
@@ -122,7 +126,53 @@ def is_dangerous_deletion(command: str) -> Tuple[bool, str]:
     # Normalize command for analysis
     cmd_lower = command.lower().strip()
     
-    # List of completely banned commands/keywords
+    # Enhanced dangerous patterns with regex support
+    dangerous_patterns = [
+        # Dangerous rm patterns (ENHANCED)
+        (r'\brm\s+.*-[a-z]*r[a-z]*f', 'rm -rf variations detected'),
+        (r'\brm\s+.*-[a-z]*f[a-z]*r', 'rm -fr variations detected'),
+        (r'\brm\s+--recursive\s+--force', 'rm recursive force detected'),
+        (r'\brm\s+.*\*.*/', 'rm with wildcards on directories'),
+        (r'\brm\s+.*\$HOME', 'rm targeting home directory'),
+        (r'\brm\s+.*~/', 'rm targeting user directory'),
+        
+        # Security violations (NEW)
+        (r'\bchmod\s+777', 'dangerous permissions 777 detected'),
+        (r'\bchmod\s+.*777', 'dangerous permissions 777 detected'),
+        (r'\bsudo\s+rm', 'sudo rm command detected'),
+        (r'\bsudo\s+chmod\s+777', 'sudo chmod 777 detected'),
+        
+        # System destruction (ENHANCED)
+        (r'\bdd\s+if=/dev/zero', 'disk zeroing command'),
+        (r'\bdd\s+if=/dev/random', 'disk randomization command'),
+        (r'>\s*/dev/sd[a-z]', 'writing to raw disk device'),
+        (r'\bmkfs\.', 'filesystem creation on device'),
+        (r'\bformat\s+[c-z]:', 'Windows format command'),
+        
+        # Remote execution risks (NEW)
+        (r'\bcurl\s+.*\|\s*(sh|bash)', 'curl pipe to shell execution'),
+        (r'\bwget\s+.*\|\s*(sh|bash)', 'wget pipe to shell execution'),
+        (r'\bcurl\s+.*-o.*\.(sh|exe|bat)', 'downloading executable files'),
+        
+        # Network/System compromise (NEW)  
+        (r'\biptables\s+-F', 'flushing firewall rules'),
+        (r'\bnetsh\s+.*reset', 'network configuration reset'),
+        (r'>\s*/etc/passwd', 'writing to passwd file'),
+        (r'>\s*/etc/shadow', 'writing to shadow file'),
+        
+        # Process/Service disruption (NEW)
+        (r'\bkillall\s+-9', 'force killing all processes'),
+        (r'\btaskkill\s+/f', 'Windows force process kill'),
+        (r'\bsc\s+delete', 'Windows service deletion'),
+        (r'\bsystemctl\s+disable.*\.(service|timer)', 'disabling system services')
+    ]
+    
+    # Check regex patterns first (more precise)
+    for pattern, reason in dangerous_patterns:
+        if re.search(pattern, cmd_lower, re.IGNORECASE):
+            return True, f"SECURITY VIOLATION: {reason}"
+    
+    # Existing banned commands (kept for compatibility)
     banned_commands = [
         # Unix/Linux deletion
         'rm ',
@@ -325,6 +375,42 @@ def notify_blocked_command(command: str, reason: str) -> None:
     except Exception as e:
         # Don't fail the hook if voice notification fails
         log_debug(f"Voice notification failed: {e}")
+
+def run_gitbutler_pre_tool(payload: Dict[str, Any]) -> None:
+    """
+    GitButler integration - runs before tool execution.
+    Only runs for file modification tools (Write, Edit, MultiEdit).
+    
+    Args:
+        payload: Hook payload containing tool information
+    """
+    try:
+        tool_name = payload.get("tool_name", "")
+        
+        # Only run for file modification tools
+        if tool_name not in ["Edit", "MultiEdit", "Write"]:
+            return
+            
+        # Check if GitButler is available
+        import subprocess
+        result = subprocess.run(
+            ["but", "claude", "pre-tool"], 
+            capture_output=True, 
+            text=True, 
+            timeout=10
+        )
+        
+        if result.returncode == 0:
+            log_debug("GitButler pre-tool command executed successfully")
+        else:
+            log_debug(f"GitButler pre-tool failed: {result.stderr}")
+            
+    except subprocess.TimeoutExpired:
+        log_debug("GitButler pre-tool command timed out")
+    except FileNotFoundError:
+        log_debug("GitButler CLI not found - skipping GitButler integration")
+    except Exception as e:
+        log_debug(f"GitButler pre-tool error: {e}")
 
 def log_debug(message: str) -> None:
     """

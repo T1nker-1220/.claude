@@ -48,25 +48,27 @@ def main() -> None:
         # Auto-stage the modified file with git
         stage_file_with_git(file_path)
         
-        # Only lint TypeScript files
-        if file_path.suffix not in [".ts", ".tsx"]:
+        # Enhanced TypeScript/JavaScript file processing
+        if file_path.suffix not in [".ts", ".tsx", ".js", ".jsx"]:
             print(json.dumps(decision))
             return
 
-        log_debug(f"Detected change in TypeScript file: {file_path}. Running linter.")
+        log_debug(f"Detected change in TypeScript/JS file: {file_path}. Running quality checks.")
 
-        # Run the linter and check for errors
-        has_errors, error_report = run_linter(file_path)
+        # GitButler post-tool integration
+        run_gitbutler_post_tool()
 
-        if has_errors:
-            log_debug(f"Linter found errors. Blocking and injecting feedback.")
-            # If errors are found, block and construct a new prompt for Claude
+        # Run comprehensive TypeScript quality checks
+        quality_issues = run_typescript_quality_checks(file_path)
+
+        if quality_issues:
+            log_debug(f"Quality issues found. Providing feedback.")
             decision = {
                 "decision": "block",
                 "reason": (
-                    f"I just ran the linter on `{file_path.name}` after your changes, and it found the following issues. "
-                    "Please fix them now.\n\n"
-                    f"Linter Report:\n{error_report}"
+                    f"🔧 TypeScript Quality Check Results for `{file_path.name}`:\n\n"
+                    f"{quality_issues}\n\n"
+                    "Please address these issues for better code quality."
                 )
             }
 
@@ -91,53 +93,162 @@ def get_file_path(payload: dict) -> str:
         return tool_response["filePath"] # Handle the camelCase key from Write/Edit tools
     return ""
 
-def run_linter(file_path: pathlib.Path) -> tuple[bool, str]:
+def run_typescript_quality_checks(file_path: pathlib.Path) -> str:
     """
-    Runs ESLint on the specified file and returns a formatted report.
+    Comprehensive TypeScript quality checks: ESLint auto-fix, Prettier, and tsc.
     
     Returns:
-        A tuple: (has_errors: bool, report: str)
+        String with quality issues found, empty if all good
     """
     project_root = find_project_root(file_path)
     if not project_root:
         log_debug(f"Could not find project root (package.json) for file {file_path}")
-        return False, ""
+        return ""
 
-    # Use npx to ensure we're using the project's local ESLint install
-    # --format json makes the output easily and reliably parsable
-    command = ["npx", "eslint", "--format", "json", str(file_path)]
-
+    quality_report = []
+    
     try:
+        # 1. Run Prettier formatting first
+        prettier_issues = run_prettier_format(file_path, project_root)
+        if prettier_issues:
+            quality_report.append(f"📝 **Prettier Formatting:**\n{prettier_issues}")
+        
+        # 2. Run ESLint with auto-fix
+        eslint_issues = run_eslint_autofix(file_path, project_root)
+        if eslint_issues:
+            quality_report.append(f"🔍 **ESLint Issues:**\n{eslint_issues}")
+        
+        # 3. Run TypeScript compilation check (for .ts/.tsx files)
+        if file_path.suffix in [".ts", ".tsx"]:
+            tsc_issues = run_typescript_check(file_path, project_root)
+            if tsc_issues:
+                quality_report.append(f"⚡ **TypeScript Compilation:**\n{tsc_issues}")
+        
+        return "\n\n".join(quality_report)
+        
+    except Exception as e:
+        log_debug(f"Error in TypeScript quality checks: {e}")
+        return ""
+
+def run_prettier_format(file_path: pathlib.Path, project_root: pathlib.Path) -> str:
+    """Run Prettier formatting and return issues if any."""
+    try:
+        # First check if file needs formatting
+        check_cmd = ["npx", "prettier", "--check", str(file_path)]
+        check_result = subprocess.run(
+            check_cmd,
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            shell=True
+        )
+        
+        if check_result.returncode == 0:
+            log_debug("Prettier: File already formatted correctly")
+            return ""
+        
+        # Auto-format the file
+        format_cmd = ["npx", "prettier", "--write", str(file_path)]
+        format_result = subprocess.run(
+            format_cmd,
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            shell=True
+        )
+        
+        if format_result.returncode == 0:
+            log_debug("Prettier: File formatted successfully")
+            return "✅ File has been auto-formatted with Prettier"
+        else:
+            return f"❌ Prettier formatting failed: {format_result.stderr}"
+            
+    except Exception as e:
+        log_debug(f"Prettier error: {e}")
+        return f"❌ Prettier error: {str(e)}"
+
+def run_eslint_autofix(file_path: pathlib.Path, project_root: pathlib.Path) -> str:
+    """Run ESLint with auto-fix and return remaining issues."""
+    try:
+        # Run ESLint with auto-fix
+        fix_cmd = ["npx", "eslint", "--fix", "--format", "json", str(file_path)]
         result = subprocess.run(
-            command,
+            fix_cmd,
             cwd=project_root,
             capture_output=True,
             text=True,
             timeout=30,
-            shell=True # shell=True can be more reliable for npx on Windows
+            shell=True
         )
-
-        if result.returncode == 0 and not result.stdout.strip():
-            log_debug("Linter ran successfully with no issues.")
-            return False, ""
-            
-        # ESLint with --format json outputs to stdout even for errors
-        lint_output = json.loads(result.stdout)
         
-        # The output is an array of file results. We only linted one file.
-        if not lint_output or not lint_output[0]['messages']:
-            log_debug("Linter ran, no messages found.")
-            return False, ""
-
-        error_report = format_error_report(lint_output)
-        return True, error_report
-
-    except (subprocess.TimeoutExpired, json.JSONDecodeError, FileNotFoundError) as e:
-        log_debug(f"Linter execution failed: {e}")
-        return False, ""
+        if result.returncode == 0 and not result.stdout.strip():
+            log_debug("ESLint: No issues found")
+            return ""
+        
+        if result.stdout.strip():
+            lint_output = json.loads(result.stdout)
+            if lint_output and lint_output[0].get('messages'):
+                error_report = format_error_report(lint_output)
+                return error_report
+        
+        log_debug("ESLint: Auto-fixed successfully")
+        return "✅ ESLint auto-fixes applied"
+        
     except Exception as e:
-        log_debug(f"An unexpected error occurred during linting: {e}")
-        return False, ""
+        log_debug(f"ESLint error: {e}")
+        return f"❌ ESLint error: {str(e)}"
+
+def run_typescript_check(file_path: pathlib.Path, project_root: pathlib.Path) -> str:
+    """Run TypeScript compilation check."""
+    try:
+        tsc_cmd = ["npx", "tsc", "--noEmit", "--skipLibCheck", str(file_path)]
+        result = subprocess.run(
+            tsc_cmd,
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            shell=True
+        )
+        
+        if result.returncode == 0:
+            log_debug("TypeScript: Compilation successful")
+            return ""
+        
+        # Format TypeScript errors
+        errors = result.stdout.strip() if result.stdout.strip() else result.stderr.strip()
+        if errors:
+            return f"❌ TypeScript compilation errors:\n```\n{errors}\n```"
+            
+        return ""
+        
+    except Exception as e:
+        log_debug(f"TypeScript check error: {e}")
+        return f"❌ TypeScript check error: {str(e)}"
+
+def run_gitbutler_post_tool() -> None:
+    """GitButler integration - runs after tool execution."""
+    try:
+        result = subprocess.run(
+            ["but", "claude", "post-tool"], 
+            capture_output=True, 
+            text=True, 
+            timeout=10
+        )
+        
+        if result.returncode == 0:
+            log_debug("GitButler post-tool command executed successfully")
+        else:
+            log_debug(f"GitButler post-tool failed: {result.stderr}")
+            
+    except subprocess.TimeoutExpired:
+        log_debug("GitButler post-tool command timed out")
+    except FileNotFoundError:
+        log_debug("GitButler CLI not found - skipping GitButler integration")
+    except Exception as e:
+        log_debug(f"GitButler post-tool error: {e}")
 
 
 def format_error_report(lint_output: list) -> str:
