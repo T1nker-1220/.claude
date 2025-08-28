@@ -389,12 +389,16 @@ def run_gitbutler_pre_tool(payload: Dict[str, Any]) -> None:
         
         # Only run for file modification tools
         if tool_name not in ["Edit", "MultiEdit", "Write"]:
+            log_debug(f"GitButler: Skipping tool '{tool_name}' - not a file modification tool")
             return
+        
+        log_debug(f"GitButler: Processing '{tool_name}' tool - running pre-tool command")
             
         # Check if GitButler is available
         import subprocess
+        gitbutler_path = r"C:\Program Files\GitButler\but.exe"
         result = subprocess.run(
-            ["but", "claude", "pre-tool"], 
+            [gitbutler_path, "claude", "pre-tool"], 
             capture_output=True, 
             text=True, 
             timeout=10

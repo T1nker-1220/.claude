@@ -85,8 +85,9 @@ def run_gitbutler_stop(payload) -> None:
     """
     try:
         # Run GitButler stop command to create commits and branches
+        gitbutler_path = r"C:\Program Files\GitButler\but.exe"
         result = subprocess.run(
-            ["but", "claude", "stop"], 
+            [gitbutler_path, "claude", "stop"], 
             capture_output=True, 
             text=True, 
             timeout=30  # Longer timeout for git operations

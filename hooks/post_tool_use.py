@@ -48,15 +48,17 @@ def main() -> None:
         # Auto-stage the modified file with git
         stage_file_with_git(file_path)
         
+        # GitButler post-tool integration (for ALL file modifications)
+        log_debug(f"GitButler: Running post-tool command for file: {file_path}")
+        run_gitbutler_post_tool()
+        
         # Enhanced TypeScript/JavaScript file processing
         if file_path.suffix not in [".ts", ".tsx", ".js", ".jsx"]:
+            log_debug(f"File modified: {file_path}. Skipping TypeScript quality checks.")
             print(json.dumps(decision))
             return
 
         log_debug(f"Detected change in TypeScript/JS file: {file_path}. Running quality checks.")
-
-        # GitButler post-tool integration
-        run_gitbutler_post_tool()
 
         # Run comprehensive TypeScript quality checks
         quality_issues = run_typescript_quality_checks(file_path)
@@ -231,8 +233,9 @@ def run_typescript_check(file_path: pathlib.Path, project_root: pathlib.Path) ->
 def run_gitbutler_post_tool() -> None:
     """GitButler integration - runs after tool execution."""
     try:
+        gitbutler_path = r"C:\Program Files\GitButler\but.exe"
         result = subprocess.run(
-            ["but", "claude", "post-tool"], 
+            [gitbutler_path, "claude", "post-tool"], 
             capture_output=True, 
             text=True, 
             timeout=10
@@ -324,10 +327,47 @@ def log_debug(message: str) -> None:
         debug_log = pathlib.Path("C:/Users/NATH/.claude/hooks/debug.log")
         timestamp = datetime.datetime.now().isoformat()
         with open(debug_log, "a", encoding="utf-8") as f:
-            f.write(f"[{timestamp}] POST_TOOL_USE_LINTER: {message}\n")
+            f.write(f"[{timestamp}] POST_TOOL_USE: {message}\n")
     except Exception:
         # Silently fail if logging doesn't work
         pass
+
+def log_to_structured_logs(payload: dict, gitbutler_result: dict = None, quality_result: str = "") -> None:
+    """
+    Log PostToolUse event to structured logs directory.
+    
+    Args:
+        payload: Hook payload containing tool information
+        gitbutler_result: GitButler command result
+        quality_result: TypeScript quality check results
+    """
+    try:
+        logs_dir = pathlib.Path("C:/Users/NATH/.claude/logs")
+        logs_dir.mkdir(exist_ok=True)
+        
+        log_file = logs_dir / "post_tool_use.json"
+        
+        timestamp = datetime.datetime.now().isoformat()
+        
+        log_entry = {
+            "timestamp": timestamp,
+            "event": "PostToolUse",
+            "session_id": payload.get("session_id", "unknown"),
+            "tool_name": payload.get("tool_name", "unknown"),
+            "tool_input": payload.get("tool_input", {}),
+            "tool_response": payload.get("tool_response", {}),
+            "cwd": payload.get("cwd", "unknown"),
+            "transcript_path": payload.get("transcript_path", "unknown"),
+            "hook_event_name": payload.get("hook_event_name", "PostToolUse"),
+            "gitbutler_result": gitbutler_result,
+            "quality_result": quality_result if quality_result else None
+        }
+        
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(f"{json.dumps(log_entry)}\n")
+            
+    except Exception as e:
+        log_debug(f"Failed to log to structured logs: {e}")
 
 if __name__ == "__main__":
     main()
