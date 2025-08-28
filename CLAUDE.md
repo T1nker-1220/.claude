@@ -54,3 +54,4 @@
 - When working on mobile view UI you need to always make the elements, fonts, texts, and etc. to be smaller as in, since the screens of mobile is not that big at all so you need to make it more compact always.
 - Always implement the mobile-first design principle for UI.
 - Always commit and follow the commit standard always as in every task that has done alright.
+- ALWAYS run parallel the agents if they are 2+ agents more alright if 1 just run it normally but when it's 2+ more you need to run it multi subagents
