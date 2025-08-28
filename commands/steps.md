@@ -97,7 +97,47 @@ Architecture Coverage:
 
 Output: Complete technical blueprint ready for implementation
 Mode: READ-ONLY - Design only, no files written
-User action: Type "go" or "g" to proceed
+User action: Type "next" to proceed to documentation creation
+
+## Step 3.5: PROJECT DOCUMENTATION & TODO CREATION (READ-ONLY)
+⚡ **CREATE SINGLE COMPREHENSIVE FILE: `docs/[task-name].md`**
+
+Write ONE file na may complete documentation with filename based on the task:
+- Example: "chat feature" → `docs/chat-feature.md`
+- Example: "user authentication" → `docs/user-authentication.md`
+- Example: "payment system" → `docs/payment-system.md`
+
+### 📋 SINGLE FILE STRUCTURE (`docs/[task-name].md`):
+
+**1. ORIGINAL TASK & GOALS**
+- User request
+- Expected outcomes
+
+**2. ALL SUBAGENT OPINIONS**
+- Research results (web-research-specialist, solution-archeologist, etc.)
+- Architecture recommendations (frontend/backend auditors)
+- Security & performance insights
+- All agent findings in one section
+
+**3. FINAL VERDICT**
+- Your decision based on all agent inputs
+- Chosen approach and reasoning
+- Architecture summary
+
+**4. SIMPLE TODO LIST**
+- Create TodoWrite with clear, simple tasks
+- Each todo: task name, priority (1-3), files affected
+- Mark as completed after each task
+- COMMIT after each completed todo
+
+**5. COMMIT STRATEGY**
+- Commit message format: "feat(scope): description"
+- One commit per completed todo
+- Follow Filipino git guidelines (no Claude references)
+
+Output: Complete project documentation and prioritized implementation todos
+Mode: READ-ONLY - Documentation creation only, no code files written
+User action: Type "go" or "g" to proceed to implementation
 
 ## Step 4: ENGINEERING (WRITE MODE ENABLED)
 Primary Claude implements the solution based on all previous steps.
