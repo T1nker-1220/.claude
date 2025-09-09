@@ -33,7 +33,7 @@
 
 ## Git & Version Control
 - when staging: just do git add . + git commit
-- format should be: type(scope): description
+- format should be: type(scope): description + bullet descriptions
 - things to avoid:
   - no Claude Code references in commits
   - no emojis in commit messages
@@ -64,3 +64,5 @@
 - ALWAYS run parallel the agents if they are 2+ agents more alright if 1 just run it normally but when it's 2+ more you need to run it multi subagents
 - NEVER wait for one agent to complete before starting another
 - Combine all agent insights after parallel execution completes
+- NEVER INCLUDE THESE IN COMMITS │   🤖 Generated with [Claude Code](https://claude.ai/code) Co-Authored-By: Claude <noreply@anthropic.com>" Create commit with detailed message
+- Search pattern is the best way to analyze the codebase so always do that and then read those files.

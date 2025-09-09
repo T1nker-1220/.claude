@@ -105,6 +105,22 @@ def process_deletion_check(payload: Dict[str, Any]) -> Dict[str, str]:
             "permissionDecisionReason": f"BLOCKED: {reason}\nCommand: {command}\n\nThis operation was blocked to prevent accidental deletion of critical files/directories."
         }
     
+    # Check for unwanted Claude Code references in git commits
+    has_claude_refs, commit_reason = has_claude_code_references(command)
+    
+    if has_claude_refs:
+        # Log the blocked operation
+        log_blocked_operation(payload, command, commit_reason)
+        
+        # Voice notification for blocked command
+        notify_blocked_commit(command, commit_reason)
+        
+        # Use proper permission format per Claude Code docs
+        return {
+            "permissionDecision": "deny",
+            "permissionDecisionReason": f"BLOCKED: {commit_reason}\nCommand: {command}\n\nThis commit was blocked to prevent Claude Code references in commit messages."
+        }
+    
     # For safe Bash commands, return empty to let Claude handle normally
     return {}
 
@@ -372,6 +388,56 @@ def notify_blocked_command(command: str, reason: str) -> None:
         # Don't fail the hook if voice notification fails
         log_debug(f"Voice notification failed: {e}")
 
+
+def has_claude_code_references(command: str) -> Tuple[bool, str]:
+    """
+    Check if git commit command contains unwanted Claude Code references.
+    
+    Args:
+        command: The bash command to analyze
+        
+    Returns:
+        Tuple of (has_references: bool, reason: str)
+    """
+    # Only check git commit commands
+    if not ("git commit" in command.lower()):
+        return False, ""
+    
+    # Patterns to block in commit messages
+    blocked_patterns = [
+        "Generated with [Claude Code](https://claude.ai/code)",
+        "Co-Authored-By: Claude <noreply@anthropic.com>",
+        "🤖 Generated with [Claude Code]",
+        "claude.ai/code",
+        "noreply@anthropic.com"
+    ]
+    
+    for pattern in blocked_patterns:
+        if pattern in command:
+            return True, f"Commit message contains blocked Claude Code reference: '{pattern}'"
+    
+    return False, ""
+
+def notify_blocked_commit(command: str, reason: str) -> None:
+    """
+    Send voice notification for blocked commit.
+    
+    Args:
+        command: The blocked command
+        reason: Reason for blocking
+    """
+    try:
+        if VOICE_AVAILABLE:
+            voice_message = "Blocked commit with Claude Code references"
+            log_debug(f"Sending voice notification: {voice_message}")
+            speak(voice_message)
+            log_debug("Voice notification sent successfully")
+        else:
+            log_debug("Voice notification unavailable")
+        
+    except Exception as e:
+        # Don't fail the hook if voice notification fails
+        log_debug(f"Voice notification failed: {e}")
 
 def log_debug(message: str) -> None:
     """
