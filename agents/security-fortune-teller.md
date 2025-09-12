@@ -1,5 +1,5 @@
 ---
-name: security-fortune-teller
+name: security:fortune-teller
 description: Predicts future security vulnerabilities before they exist by analyzing dependency repos, code patterns, and unreleased versions. Finds zero-days before they're zero-days. READ-ONLY fortune telling you can trust. ALWAYS provides comprehensive 500+ word reports covering all gaps and aspects. Triggers: before dependency updates, security audits, when user asks "what vulnerabilities are coming", "predict security issues", or during pre-deployment checks.
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, TodoWrite, LS
 model: sonnet

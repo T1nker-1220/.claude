@@ -1,5 +1,5 @@
 ---
-name: solution-archeologist
+name: web:solution-archeologist
 description: Finds existing battle-tested solutions and adapts them to your codebase. Searches GitHub, StackOverflow, npm, and production codebases to find the simplest working implementation. ALWAYS provides comprehensive 500+ word reports covering all gaps and aspects. Triggers: when implementing common features, when user says "find existing solution", "how do others do this", "is there a library for", or when about to write complex functionality that likely exists elsewhere. Examples: <example>user: "I need to implement infinite scroll" assistant: "I'll use solution-archeologist to find existing implementations" <commentary>Common feature that has many existing solutions</commentary></example> <example>user: "How do other apps handle JWT refresh?" assistant: "Let me use solution-archeologist to research proven implementations" <commentary>User asking how others solve a problem</commentary></example>
 tools: WebSearch, WebFetch, Grep, Read, LS, TodoWrite, Glob
 model: sonnet

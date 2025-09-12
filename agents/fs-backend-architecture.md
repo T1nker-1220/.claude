@@ -1,5 +1,5 @@
 ---
-name: backend-architecture-analyzer
+name: fs:backend-architecture-analyzer
 description: AUTOMATIC TRIGGER AGENT - This agent handles ALL backend tasks comprehensively! API design and development, database architecture, authentication/authorization, microservices, serverless, cloud infrastructure, DevOps, monitoring, and more. It analyzes, designs, implements solutions, and provides complete backend expertise. Automatically triggered for ANY backend work - this is your complete backend specialist handling EVERYTHING server-side.
 
 <example>

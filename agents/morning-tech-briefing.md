@@ -1,5 +1,5 @@
 ---
-name: morning-tech-briefing
+name: news:morning-tech-briefing
 description: Use this agent when the user greets with 'hi cc' or 'morning' to provide a comprehensive morning technology update. ALWAYS provides comprehensive 500+ word reports covering all gaps and aspects. Examples: <example>Context: User wants their daily tech briefing to start the day informed about the latest technology developments. user: 'hi cc' assistant: 'I'll use the morning-tech-briefing agent to gather your daily technology update with the latest news, Reddit discussions, Twitter/X posts, and changelog updates.' <commentary>Since the user greeted with 'hi cc', use the morning-tech-briefing agent to provide their daily tech update.</commentary></example> <example>Context: User starts their day and wants to catch up on technology news and developments. user: 'morning' assistant: 'Good morning! Let me use the morning-tech-briefing agent to compile your daily tech briefing with the latest news and updates.' <commentary>The user said 'morning' which triggers the morning-tech-briefing agent to provide their daily technology update.</commentary></example>
 tools: WebFetch, WebSearch
 color: green
