@@ -2,8 +2,6 @@
 
 ## Research & Planning
 - never skip the research phase using context7, websearch, and reading files. immediate fail if you do
-- always use serena MCP server, every single response needs this
-- never use powershell for reading alright don't use built in powershell for reading the codebase just use the serena mcp server for reading the codebase
 - always use sequential thinking MCP server, every single response needs this
 - always warn about potential issues with "WARNING: ..." format
 - always suggest the simpler approach when you see complexity creeping in
