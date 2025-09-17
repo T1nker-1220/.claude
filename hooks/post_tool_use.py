@@ -61,9 +61,6 @@ def main() -> None:
 
         file_path = pathlib.Path(file_path_str)
         
-        # Auto-stage the modified file with git
-        stage_file_with_git(file_path)
-        
         # Enhanced TypeScript/JavaScript file processing
         if file_path.suffix not in [".ts", ".tsx", ".js", ".jsx"]:
             log_debug(f"File modified: {file_path}. Skipping TypeScript quality checks.")
@@ -250,48 +247,6 @@ def find_project_root(start_path: pathlib.Path) -> pathlib.Path | None:
     current = start_path.parent
     while current != current.parent: # Stop at the filesystem root
         if (current / "package.json").exists():
-            return current
-        current = current.parent
-    return None
-
-def stage_file_with_git(file_path: pathlib.Path) -> None:
-    """
-    Stages the specified file with git add.
-    Fails silently if not in a git repository or if git command fails.
-    """
-    try:
-        # Check if we're in a git repository by looking for .git directory
-        current_dir = file_path.parent
-        git_root = find_git_root(current_dir)
-        
-        if not git_root:
-            log_debug(f"File {file_path} is not in a git repository. Skipping git staging.")
-            return
-            
-        # Stage the file using git add
-        command = ["git", "add", str(file_path)]
-        result = subprocess.run(
-            command,
-            cwd=git_root,
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        
-        if result.returncode == 0:
-            log_debug(f"Successfully staged file: {file_path}")
-            speak(f"File staged: {file_path.name}")
-        else:
-            log_debug(f"Git staging failed for {file_path}: {result.stderr.strip()}")
-            
-    except Exception as e:
-        log_debug(f"Error during git staging for {file_path}: {e}")
-
-def find_git_root(start_path: pathlib.Path) -> pathlib.Path | None:
-    """Finds the git repository root by looking for a .git directory."""
-    current = start_path
-    while current != current.parent:  # Stop at the filesystem root
-        if (current / ".git").exists():
             return current
         current = current.parent
     return None
