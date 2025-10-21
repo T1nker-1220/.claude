@@ -22,3 +22,6 @@ shell-snapshots
 html/
 save.md
 mcp-backups.md
+debug/
+file-history/
+history.jsonl
