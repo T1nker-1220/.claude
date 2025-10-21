@@ -8,6 +8,8 @@
 - Automatically deploy relevant subagents in parallel whenever their capabilities match the task context. Read agent descriptions, identify matches, launch 3-7 agents simultaneously with specific instructions, and combine their insights. No permission needed - this is default behavior.
 
 ## Skills Usage - Mandatory
+- **AUTOMATICALLY trigger relevant skills** - read skill descriptions, match with task context, activate proactively
+- **DON'T wait for user to command** - skills should activate automatically based on task type, not on user request
 - **ALWAYS use project skills** based on task context - multiple skills if relevant
 - Available skills:
   - typescript-enforcer (type safety, no "any" types)
