@@ -1,7 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
-    "ANTHROPIC_MODEL": "opusplan",
     "DISABLE_AUTOUPDATER": "1"
   },
   "permissions": {
@@ -71,11 +70,11 @@
       "mcp__serena__onboarding",
       "mcp__serena__think_about_collected_information",
       "mcp__serena__think_about_task_adherence",
-      "mcp__serena__think_about_whether_you_are_done"
+      "mcp__serena__think_about_whether_you_are_done",
+      "Skill(skill-creation-guide)"
     ],
     "defaultMode": "default"
   },
-  "model": "sonnet[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -150,6 +149,7 @@
     "command": "npx -y ccstatusline@latest",
     "padding": 0
   },
+  "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754150831801
   }
