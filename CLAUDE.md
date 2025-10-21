@@ -26,6 +26,7 @@
 - Skills provide deep expertise automatically - invoke them for comprehensive guidance
 - Multiple skills can be used together - don't limit to just one
 - Skills are mandatory tools, not optional - use them on every relevant task
+- There's also a skills on project directory you need to trigger/use them too.
 
 ## File Management
 - never create files that aren't needed (especially *.md files unless explicitly asked)
