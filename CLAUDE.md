@@ -2,18 +2,17 @@
 
 ## Research & Planning
 - never skip the research phase using context7, websearch, and reading files. immediate fail if you do
-- always use sequential thinking MCP server, every single response needs this
 - always warn about potential issues with "WARNING: ..." format
 - always suggest the simpler approach when you see complexity creeping in
 - deep understanding means read the code first before anything
 - Automatically deploy relevant subagents in parallel whenever their capabilities match the task context. Read agent descriptions, identify matches, launch 3-7 agents simultaneously with specific instructions, and combine their insights. No permission needed - this is default behavior.
 
-## Debugging
-- ALWAYS use detective-sam-debugger agent for ALL debugging tasks, issues, problems, and troubleshooting
-- NEVER attempt manual debugging - always call detective-sam for comprehensive analysis
-- For any bug, error, performance issue, or system problem: immediately deploy detective-sam-debugger
-- detective-sam provides 100% certainty analysis with exactly 3 validated solutions - no hunches allowed
-- Use detective-sam for: flow analysis, root cause investigation, memory leaks, race conditions, API issues, integration problems, performance bottlenecks, and any technical problems
+## Skills Usage - Mandatory
+- **ALWAYS use project skills** based on task context - multiple skills if relevant
+- Available skills: centralized-systems-enforcer, firebase-mobile-compatibility, debugging-solutions, api-security-builder, skill-creation-guide
+- Skills provide deep expertise automatically - invoke them for comprehensive guidance
+- Multiple skills can be used together - don't limit to just one
+- Skills are mandatory tools, not optional - use them on every relevant task
 
 ## Development Philosophy
 - If I want a feature you need to avoid making the engeneering complex or complicated. keep it simple if it's getting complicated you need to approach user about this, you need to help and warn him about this feature is getting complicated.
@@ -26,7 +25,12 @@
 - SoC (Separation of Concerns) - mixed concerns means split
 - Filipino Wisdom: "Wag mong isama kung hindi mo kailangan" - apply to every line
 - clarity beats cleverness every single time
-- minimal dependencies because each one is future technical debt
+
+## Package Management
+- for feature requests: use context7/websearch to find existing packages first
+- maximize packages to minimize custom code and complexity
+- recommend packages only, never decide - user approves
+- check if new package conflicts with existing instructions, remove conflicts
 
 ## File Management
 - never create files that aren't needed (especially *.md files unless explicitly asked)
@@ -57,12 +61,37 @@
 - if yes: measure before you optimize anything
 - default stance: no premature optimization, period
 
+## Code Minimalism
+- less code, same functionality - this is the goal
+- remove unnecessary lines, abstractions
+- clean and powerful over verbose and complex
+- exact functionality only, no extra features
+- every line must justify its existence
+
+## Code Comments
+- use "//comment here..." format for inline comments
+- 1-3 lines max per comment block
+- explain purpose and functionality clearly
+- professional and standard style
+- avoid super short comments that don't explain anything
+- make code easy to understand through meaningful comments
+
+## TypeScript Type Safety
+- NEVER use "any" type - this is an immediate fail
+- always define proper types and interfaces for all data structures
+- avoid type mismatches by being explicit with types
+- use strict type checking to catch errors early
+- when unsure about a type, use "unknown" and narrow it down with type guards
+- prefer specific types over broad ones (e.g., string literals over string)
+- always type function parameters and return values explicitly
+- reject pull requests with "any" types unless absolutely justified
+- use TypeScript utility types (Partial, Pick, Omit, etc.) instead of "any"
+- type safety is non-negotiable - no shortcuts
+
 ## UI & Mobile Development
 - When working on mobile view UI you need to always make the elements, fonts, texts, and etc. to be smaller as in, since the screens of mobile is not that big at all so you need to make it more compact always.
 - Always implement the mobile-first design principle for UI.
 - Always commit and follow the commit standard always as in every task that has done alright.
 - ALWAYS run parallel the agents if they are 2+ agents more alright if 1 just run it normally but when it's 2+ more you need to run it multi subagents
 - NEVER wait for one agent to complete before starting another
-- Combine all agent insights after parallel execution completes
-- NEVER INCLUDE THESE IN COMMITS │   🤖 Generated with [Claude Code](https://claude.ai/code) Co-Authored-By: Claude <noreply@anthropic.com>" Create commit with detailed message
 - Search pattern is the best way to analyze the codebase so always do that and then read those files.
